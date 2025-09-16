@@ -39,6 +39,7 @@ The system will be developed using **Next.js**, which will serve both as the cli
 - **PostgreSQL** – relational database to store tests, questions, answers, and user data;
 - **Drizzle ORM** – lightweight ORM to simplify SQL operations.
 
+
 The system deployment diagram is shown below.
 
-<img width="821" height="373" alt="deployment" src="https://github.com/user-attachments/assets/8c62fe0a-16da-4a25-97b9-5ca4dbc34797" />
+<img width="912" height="376" alt="deployment" src="https://github.com/user-attachments/assets/587da4e4-c3fc-4a0d-9ced-e4a352c62d37" />

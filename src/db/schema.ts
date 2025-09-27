@@ -45,7 +45,6 @@ export const topicQuestions = pgTable(
   })
 );
 
-// Relations (optional; useful if using drizzle relational queries)
 export const topicsRelations = relations(topics, ({ many }) => ({
   topicQuestions: many(topicQuestions),
 }));

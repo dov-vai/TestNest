@@ -9,7 +9,7 @@ export function json(data: unknown, init: ResponseInit = {}): Response {
 
 export function badRequest(error: unknown): Response {
   if (error instanceof ZodError) {
-    return json({ error: "Invalid request", issues: z.treeifyError(error) }, { status: 400 });
+    return json({ error: "Validation failed", issues: z.treeifyError(error) }, { status: 422 });
   }
   return json({ error: String(error) }, { status: 400 });
 }

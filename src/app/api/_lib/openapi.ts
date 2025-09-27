@@ -13,7 +13,10 @@ const openapi = {
           { name: "limit", in: "query", schema: { type: "integer" } },
           { name: "offset", in: "query", schema: { type: "integer" } },
         ],
-        responses: { "200": { description: "OK" } },
+        responses: { 
+          "200": { description: "OK" },
+          "422": { description: "Validation error" }
+        },
       },
       post: {
         summary: "Create topic",
@@ -33,14 +36,22 @@ const openapi = {
             },
           },
         },
-        responses: { "201": { description: "Created" } },
+        responses: {
+          "201": { description: "Created" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/topics/{id}": {
       get: {
         summary: "Get topic",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: { 
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
       patch: {
         summary: "Update topic",
@@ -58,19 +69,32 @@ const openapi = {
             },
           },
         },
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
       delete: {
         summary: "Delete topic",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/topics/{id}/full": {
       get: {
         summary: "Get topic with questions and answers",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: { 
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/questions": {
@@ -80,7 +104,10 @@ const openapi = {
           { name: "limit", in: "query", schema: { type: "integer" } },
           { name: "offset", in: "query", schema: { type: "integer" } },
         ],
-        responses: { "200": { description: "OK" } },
+        responses: { 
+          "200": { description: "OK" },
+          "422": { description: "Validation error" }
+        },
       },
       post: {
         summary: "Create question",
@@ -99,14 +126,22 @@ const openapi = {
             },
           },
         },
-        responses: { "201": { description: "Created" } },
+        responses: {
+          "201": { description: "Created" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/questions/{id}": {
       get: {
         summary: "Get question",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
       patch: {
         summary: "Update question",
@@ -124,12 +159,21 @@ const openapi = {
             },
           },
         },
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
       delete: {
         summary: "Delete question",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/answers": {
@@ -139,7 +183,11 @@ const openapi = {
           { name: "limit", in: "query", schema: { type: "integer" } },
           { name: "offset", in: "query", schema: { type: "integer" } },
         ],
-        responses: { "200": { description: "OK" } },
+        responses: { 
+          "200": { description: "OK" },
+          "422": { description: "Validation error" }
+        
+        },
       },
       post: {
         summary: "Create answer",
@@ -160,14 +208,22 @@ const openapi = {
             },
           },
         },
-        responses: { "201": { description: "Created" } },
+        responses: {
+          "201": { description: "Created" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/answers/{id}": {
       get: {
         summary: "Get answer",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: { 
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
       patch: {
         summary: "Update answer",
@@ -186,19 +242,31 @@ const openapi = {
             },
           },
         },
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
       delete: {
         summary: "Delete answer",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: { 
+          "200": { description: "OK" }, 
+          "404": { description: "Not found" }, 
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/topics/{id}/questions": {
       get: {
         summary: "List topic-question links",
         parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
-        responses: { "200": { description: "OK" } },
+        responses: { 
+          "200": { description: "OK" },
+          "422": { description: "Validation error" }
+        },
       },
       post: {
         summary: "Link question to topic",
@@ -219,7 +287,11 @@ const openapi = {
             },
           },
         },
-        responses: { "201": { description: "Created" } },
+        responses: {
+          "201": { description: "Created" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
     },
     "/api/topics/{id}/questions/{linkId}": {
@@ -242,7 +314,12 @@ const openapi = {
             },
           },
         },
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: {
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "400": { description: "Malformed JSON" },
+          "422": { description: "Validation error" }
+        },
       },
       delete: {
         summary: "Unlink question from topic",
@@ -250,7 +327,11 @@ const openapi = {
           { name: "id", in: "path", required: true, schema: { type: "integer" } },
           { name: "linkId", in: "path", required: true, schema: { type: "integer" } },
         ],
-        responses: { "200": { description: "OK" }, "404": { description: "Not found" } },
+        responses: { 
+          "200": { description: "OK" },
+          "404": { description: "Not found" },
+          "422": { description: "Validation error" }
+        },
       },
     },
   },

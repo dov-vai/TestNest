@@ -1,0 +1,23 @@
+meta {
+  name: Update link
+  type: http
+  seq: 19
+}
+
+patch {
+  url: {{baseUrl}}/api/topics/:id/questions/:linkId
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+  linkId: 1
+}
+
+body:json {
+  {
+    "orderIdx": 2,
+    "points": 7
+  }
+}

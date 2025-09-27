@@ -1,0 +1,23 @@
+meta {
+  name: Link question to topic
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/api/topics/:id/questions
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "questionId": 9,
+    "orderIdx": 99,
+    "points": 1
+  }
+}

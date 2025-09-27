@@ -1,0 +1,16 @@
+meta {
+  name: List topics
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api/topics
+  body: none
+  auth: inherit
+}
+
+params:query {
+  ~limit: 10
+  ~offset: 0
+}

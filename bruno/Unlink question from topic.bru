@@ -1,0 +1,16 @@
+meta {
+  name: Unlink question from topic
+  type: http
+  seq: 20
+}
+
+delete {
+  url: {{baseUrl}}/api/topics/:id/questions/:linkId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+  linkId: 1
+}

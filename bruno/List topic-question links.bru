@@ -1,0 +1,15 @@
+meta {
+  name: List topic-question links
+  type: http
+  seq: 17
+}
+
+get {
+  url: {{baseUrl}}/api/topics/:id/questions
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}

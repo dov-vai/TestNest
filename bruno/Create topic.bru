@@ -1,0 +1,19 @@
+meta {
+  name: Create topic
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/topics
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "title": "Demo Topic",
+    "description": "Created via Bruno",
+    "createdBy": "bruno"
+  }
+}

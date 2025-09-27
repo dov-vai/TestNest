@@ -1,0 +1,22 @@
+meta {
+  name: Update topic
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{baseUrl}}/api/topics/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "title": "Basic Math Updated",
+    "description": "Arithmetic and algebra basics (updated)"
+  }
+}

@@ -1,0 +1,17 @@
+meta {
+  name: Demo 200 Delete OK
+  type: http
+  seq: 34
+}
+
+delete {
+  url: {{baseUrl}}/api/answers/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 2
+}
+
+

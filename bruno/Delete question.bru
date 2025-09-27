@@ -1,0 +1,15 @@
+meta {
+  name: Delete question
+  type: http
+  seq: 11
+}
+
+delete {
+  url: {{baseUrl}}/api/questions/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 12
+}

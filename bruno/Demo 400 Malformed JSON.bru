@@ -1,0 +1,17 @@
+meta {
+  name: Demo 400 Malformed JSON
+  type: http
+  seq: 31
+}
+
+post {
+  url: {{baseUrl}}/api/topics
+  body: text
+  auth: inherit
+}
+
+body:text {
+  { "title": "missing-quote }
+}
+
+

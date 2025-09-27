@@ -1,0 +1,22 @@
+meta {
+  name: Demo 201 Created
+  type: http
+  seq: 33
+}
+
+post {
+  url: {{baseUrl}}/api/answers
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "questionId": 2,
+    "text": "11",
+    "isCorrect": false,
+    "orderIdx": 99
+  }
+}
+
+

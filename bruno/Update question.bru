@@ -1,0 +1,22 @@
+meta {
+  name: Update question
+  type: http
+  seq: 10
+}
+
+patch {
+  url: {{baseUrl}}/api/questions/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "text": "What is 2 + 2? (updated)",
+    "type": "single"
+  }
+}

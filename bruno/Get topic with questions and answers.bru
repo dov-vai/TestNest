@@ -1,0 +1,15 @@
+meta {
+  name: Get topic with questions and answers
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}/api/topics/:id/full
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}

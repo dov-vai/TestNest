@@ -1,0 +1,15 @@
+meta {
+  name: Delete answer
+  type: http
+  seq: 16
+}
+
+delete {
+  url: {{baseUrl}}/api/answers/:id
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 3
+}

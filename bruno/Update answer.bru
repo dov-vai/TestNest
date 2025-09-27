@@ -1,0 +1,23 @@
+meta {
+  name: Update answer
+  type: http
+  seq: 15
+}
+
+patch {
+  url: {{baseUrl}}/api/answers/:id
+  body: json
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+body:json {
+  {
+    "text": "4 (updated)",
+    "isCorrect": true,
+    "orderIdx": 6
+  }
+}

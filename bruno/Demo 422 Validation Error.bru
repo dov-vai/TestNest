@@ -1,0 +1,20 @@
+meta {
+  name: Demo 422 Validation Error
+  type: http
+  seq: 32
+}
+
+post {
+  url: {{baseUrl}}/api/questions
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "text": "",
+    "type": "invalid-type"
+  }
+}
+
+

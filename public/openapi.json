@@ -1003,28 +1003,6 @@
         }
       }
     },
-    "/openapi.json": {
-      "get": {
-        "operationId": "get-openapi.json",
-        "summary": "",
-        "description": "",
-        "tags": [
-          "Openapi.json"
-        ],
-        "parameters": [],
-        "responses": {
-          "400": {
-            "$ref": "#/components/responses/400"
-          },
-          "422": {
-            "$ref": "#/components/responses/422"
-          },
-          "500": {
-            "$ref": "#/components/responses/500"
-          }
-        }
-      }
-    },
     "/questions": {
       "get": {
         "operationId": "get-questions",

@@ -2,9 +2,15 @@ import { NextRequest } from "next/server";
 import { db } from "@/db/client";
 import { topicQuestions } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
-import { json, badRequest, notFound, serverError } from "../../../../_lib/http";
+import { json, badRequest, notFound, serverError, handleError } from "../../../../_lib/http";
 import { idParamSchema, topicQuestionUpdateSchema } from "../../../../_lib/validators";
 
+/**
+ * Update topic-question link
+ * @body topicQuestionUpdateSchema
+ * @response 200:topicQuestionSchema
+ * @openapi
+ */
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string; linkId: string }> }) {
   try {
     const awaited = await context.params;
@@ -24,6 +30,11 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   }
 }
 
+/**
+ * Unlink question from topic
+ * @response 200:deletedSchema
+ * @openapi
+ */
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string; linkId: string }> }) {
   try {
     const awaited = await context.params;
@@ -36,7 +47,7 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     if (!deleted) return notFound("Link not found");
     return json({ id: deleted.id });
   } catch (e) {
-    return serverError(e);
+    return handleError(e);
   }
 }
 

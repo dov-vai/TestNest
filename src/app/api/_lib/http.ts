@@ -26,3 +26,10 @@ export function serverError(error: unknown): Response {
   return json({ error: "Internal Server Error", detail: String(error) }, { status: 500 });
 }
 
+export function handleError(error: unknown): Response {
+  if (error instanceof ZodError) {
+    return badRequest(error);
+  }
+  return serverError(error);
+}
+

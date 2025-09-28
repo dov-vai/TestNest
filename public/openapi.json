@@ -1,0 +1,1554 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TestNest API",
+    "version": "1.0.0",
+    "description": "OpenAPI specification for TestNest API"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "answerSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Answer id"
+          },
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "text": {
+            "type": "string",
+            "description": "Answer text"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "description": "Is correct"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Order index"
+          }
+        },
+        "required": [
+          "id",
+          "questionId",
+          "text",
+          "isCorrect",
+          "orderIdx"
+        ]
+      },
+      "answerUpdateSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": true,
+            "description": "Updated text"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Updated correctness"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Updated order index"
+          }
+        }
+      },
+      "deletedSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Deleted id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "answerListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/answerSchema"
+        }
+      },
+      "answerCreateSchema": {
+        "type": "object",
+        "properties": {
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Related question id"
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Answer text"
+          },
+          "isCorrect": {
+            "type": "boolean",
+            "default": false,
+            "description": "Marks if answer is correct"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Ordering index (>=0)"
+          }
+        },
+        "required": [
+          "questionId",
+          "text",
+          "isCorrect",
+          "orderIdx"
+        ]
+      },
+      "questionSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "text": {
+            "type": "string",
+            "description": "Question text"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "multi",
+              "single",
+              "true_false",
+              "fill_blank"
+            ],
+            "description": "Question type"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "type"
+        ]
+      },
+      "questionUpdateSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": true,
+            "description": "Updated text"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "multi",
+              "single",
+              "true_false",
+              "fill_blank"
+            ],
+            "nullable": true,
+            "description": "Updated type"
+          }
+        }
+      },
+      "questionListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/questionSchema"
+        }
+      },
+      "questionCreateSchema": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Question text"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "multi",
+              "single",
+              "true_false",
+              "fill_blank"
+            ],
+            "description": "Question type"
+          }
+        },
+        "required": [
+          "text",
+          "type"
+        ]
+      },
+      "topicFullSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "title": {
+            "type": "string",
+            "description": "Topic title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Topic description (nullable)"
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true,
+            "description": "Creator identifier"
+          },
+          "createdAt": {
+            "type": "object",
+            "description": "Created at (ISO)"
+          },
+          "updatedAt": {
+            "type": "object",
+            "description": "Updated at (ISO)"
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/topicQuestionFullSchema"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "createdAt",
+          "updatedAt",
+          "questions"
+        ]
+      },
+      "topicQuestionUpdateSchema": {
+        "type": "object",
+        "properties": {
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "New order index"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "nullable": true,
+            "description": "New points value"
+          }
+        }
+      },
+      "topicQuestionSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Link id"
+          },
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Order index"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Points"
+          }
+        },
+        "required": [
+          "id",
+          "topicId",
+          "questionId",
+          "orderIdx",
+          "points"
+        ]
+      },
+      "topicQuestionLinkSchema": {
+        "type": "object",
+        "properties": {
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Order index within topic"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Points for this question in topic"
+          }
+        },
+        "required": [
+          "topicId",
+          "questionId",
+          "orderIdx",
+          "points"
+        ]
+      },
+      "topicQuestionListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/topicQuestionSchema"
+        }
+      },
+      "topicSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "title": {
+            "type": "string",
+            "description": "Topic title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Topic description (nullable)"
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true,
+            "description": "Creator identifier"
+          },
+          "createdAt": {
+            "type": "object",
+            "description": "Created at (ISO)"
+          },
+          "updatedAt": {
+            "type": "object",
+            "description": "Updated at (ISO)"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "topicUpdateSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": true,
+            "description": "New title (optional)"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "New description (nullable, optional)"
+          }
+        }
+      },
+      "topicListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/topicSchema"
+        }
+      },
+      "topicCreateSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Topic title"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "description": "Optional topic description"
+          },
+          "createdBy": {
+            "type": "string",
+            "nullable": true,
+            "description": "Creator identifier (optional)"
+          }
+        },
+        "required": [
+          "title"
+        ]
+      },
+      "idParamSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Positive integer id"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "paginationSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "string"
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "default": 0,
+            "description": "Offset from start (>=0)"
+          }
+        },
+        "required": [
+          "limit",
+          "offset"
+        ]
+      },
+      "questionWithAnswersSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "text": {
+            "type": "string",
+            "description": "Question text"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "multi",
+              "single",
+              "true_false",
+              "fill_blank"
+            ],
+            "description": "Question type"
+          },
+          "answers": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "type",
+          "answers",
+          "answers"
+        ]
+      },
+      "topicQuestionFullSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Link id"
+          },
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Order index"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Points"
+          },
+          "question": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "topicId",
+          "questionId",
+          "orderIdx",
+          "points"
+        ]
+      }
+    },
+    "responses": {
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Invalid request parameters"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Authentication required"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "403": {
+        "description": "Forbidden",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Access denied"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "404": {
+        "description": "Not Found",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource not found"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "409": {
+        "description": "Conflict",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Resource already exists"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "422": {
+        "description": "Validation error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "Validation failed"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Internal Server Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "example": "An unexpected error occurred"
+                },
+                "issues": {
+                  "type": "object",
+                  "nullable": true,
+                  "example": {
+                    "body": [
+                      {
+                        "code": "invalid_type",
+                        "message": "Expected string, received number",
+                        "path": [
+                          "text"
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "detail": {
+                  "type": "string",
+                  "nullable": true,
+                  "example": "Additional error details"
+                }
+              },
+              "required": [
+                "error"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "outputDir": "./public",
+  "paths": {
+    "/answers": {
+      "get": {
+        "operationId": "get-answers",
+        "summary": "List answers",
+        "description": "",
+        "tags": [
+          "Answers"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/answerListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post-answers",
+        "summary": "Create answer",
+        "description": "",
+        "tags": [
+          "Answers"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/answerCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/answerSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/answers/{id}": {
+      "get": {
+        "operationId": "get-answers-{id}",
+        "summary": "Get answer by id",
+        "description": "",
+        "tags": [
+          "Answers"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/answerSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch-answers-{id}",
+        "summary": "Update answer",
+        "description": "",
+        "tags": [
+          "Answers"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/answerUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/answerSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-answers-{id}",
+        "summary": "Delete answer",
+        "description": "",
+        "tags": [
+          "Answers"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deletedSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/openapi.json": {
+      "get": {
+        "operationId": "get-openapi.json",
+        "summary": "",
+        "description": "",
+        "tags": [
+          "Openapi.json"
+        ],
+        "parameters": [],
+        "responses": {
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/questions": {
+      "get": {
+        "operationId": "get-questions",
+        "summary": "List questions",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/questionListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post-questions",
+        "summary": "Create question",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/questionCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/questionSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/questions/{id}": {
+      "get": {
+        "operationId": "get-questions-{id}",
+        "summary": "Get question by id",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/questionSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch-questions-{id}",
+        "summary": "Update question",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/questionUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/questionSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-questions-{id}",
+        "summary": "Delete question",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deletedSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics": {
+      "get": {
+        "operationId": "get-topics",
+        "summary": "List topics",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post-topics",
+        "summary": "Create topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topicCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Validation error"
+                }
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics/{id}": {
+      "get": {
+        "operationId": "get-topics-{id}",
+        "summary": "Get topic by id",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch-topics-{id}",
+        "summary": "Update topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topicUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-topics-{id}",
+        "summary": "Delete topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deletedSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics/{id}/full": {
+      "get": {
+        "operationId": "get-topics-{id}-full",
+        "summary": "Get topic with questions and answers",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicFullSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics/{id}/questions": {
+      "post": {
+        "operationId": "post-topics-{id}-questions",
+        "summary": "Link question to topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topicQuestionLinkSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicQuestionSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "get": {
+        "operationId": "get-topics-{id}-questions",
+        "summary": "List topic-question links",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicQuestionListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics/{id}/questions/{linkId}": {
+      "patch": {
+        "operationId": "patch-topics-{id}-questions-{linkId}",
+        "summary": "Update topic-question link",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/topicQuestionUpdateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/topicQuestionSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-topics-{id}-questions-{linkId}",
+        "summary": "Unlink question from topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/deletedSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    }
+  }
+}

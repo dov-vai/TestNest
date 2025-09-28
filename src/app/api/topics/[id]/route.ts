@@ -5,6 +5,12 @@ import { eq } from "drizzle-orm";
 import { json, badRequest, notFound, serverError } from "../../_lib/http";
 import { idParamSchema, topicUpdateSchema } from "../../_lib/validators";
 
+/**
+ * Get topic by id
+ * @response 200:topicSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
@@ -16,6 +22,13 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   }
 }
 
+/**
+ * Update topic
+ * @body topicUpdateSchema
+ * @response 200:topicSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
@@ -29,6 +42,12 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   }
 }
 
+/**
+ * Delete topic
+ * @response 200:deletedSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);

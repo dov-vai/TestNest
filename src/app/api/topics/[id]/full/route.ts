@@ -5,6 +5,12 @@ import { eq, asc, inArray } from "drizzle-orm";
 import { json, badRequest, notFound } from "../../../_lib/http";
 import { idParamSchema } from "../../../_lib/validators";
 
+/**
+ * Get topic with questions and answers
+ * @response 200:topicFullSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);

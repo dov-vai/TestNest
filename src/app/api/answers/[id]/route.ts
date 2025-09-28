@@ -2,9 +2,15 @@ import { NextRequest } from "next/server";
 import { db } from "@/db/client";
 import { answers } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { json, badRequest, notFound, serverError } from "../../_lib/http";
+import { json, badRequest, notFound, serverError, handleError } from "../../_lib/http";
 import { idParamSchema, answerUpdateSchema } from "../../_lib/validators";
 
+/**
+ * Get answer by id
+ * @response 200:answerSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
@@ -16,6 +22,13 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   }
 }
 
+/**
+ * Update answer
+ * @body answerUpdateSchema
+ * @response 200:answerSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function PATCH(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
@@ -29,6 +42,12 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
   }
 }
 
+/**
+ * Delete answer
+ * @response 200:deletedSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
@@ -36,7 +55,7 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     if (!deleted) return notFound("Answer not found");
     return json({ id: deleted.id });
   } catch (e) {
-    return serverError(e);
+    return handleError(e);
   }
 }
 

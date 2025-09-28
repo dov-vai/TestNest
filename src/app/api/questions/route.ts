@@ -5,6 +5,12 @@ import { json, badRequest, serverError } from "../_lib/http";
 import { paginationSchema, questionCreateSchema } from "../_lib/validators";
 import { sql } from "drizzle-orm";
 
+/**
+ * List questions
+ * @response 200:questionListSchema
+ * @responseSet public
+ * @openapi
+ */
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
@@ -22,6 +28,12 @@ export async function GET(req: NextRequest) {
   }
 }
 
+/**
+ * Create question
+ * @body questionCreateSchema
+ * @response 201:questionSchema
+ * @openapi
+ */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();

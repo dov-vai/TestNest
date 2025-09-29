@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
-import { questions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getQuestionById, updateQuestion, deleteQuestion } from "@/db/queries/questions";
 import { json, badRequest, notFound, handleError } from "../../_lib/http";
-import { idParamSchema, questionUpdateSchema } from "../../_lib/validators";
+import { idParamSchema } from "../../_lib/schemas/common";
+import { questionUpdateSchema } from "../../_lib/schemas/question";
 
 /**
  * Get question by id
@@ -14,7 +14,7 @@ import { idParamSchema, questionUpdateSchema } from "../../_lib/validators";
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
-    const [row] = await db.select().from(questions).where(eq(questions.id, id));
+    const row = await getQuestionById(db, id);
     if (!row) return notFound("Question not found");
     return json(row);
   } catch (e) {
@@ -34,7 +34,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const { id } = idParamSchema.parse(await context.params);
     const body = await req.json();
     const data = questionUpdateSchema.parse(body);
-    const [updated] = await db.update(questions).set(data).where(eq(questions.id, id)).returning();
+    const updated = await updateQuestion(db, id, data);
     if (!updated) return notFound("Question not found");
     return json(updated);
   } catch (e) {
@@ -51,7 +51,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
-    const [deleted] = await db.delete(questions).where(eq(questions.id, id)).returning();
+    const deleted = await deleteQuestion(db, id);
     if (!deleted) return notFound("Question not found");
     return json({ id: deleted.id });
   } catch (e) {

@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
-import { answers } from "@/db/schema";
 import { json, badRequest, serverError } from "../_lib/http";
-import { paginationSchema, answerCreateSchema } from "../_lib/validators";
-import { sql } from "drizzle-orm";
+import { paginationSchema } from "../_lib/schemas/common";
+import { answerCreateSchema } from "../_lib/schemas/answer";
+import { listAnswers, createAnswer } from "@/db/queries/answers";
 
 /**
  * List answers
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
 
-    const data = await db.select().from(answers).limit(limit).offset(offset).orderBy(sql`id asc`);
+    const data = await listAnswers(db, { limit, offset });
     return json(data);
   } catch (e) {
     return serverError(e);
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = answerCreateSchema.parse(body);
-    const [created] = await db.insert(answers).values(parsed).returning();
+    const created = await createAnswer(db, parsed);
     return json(created, { status: 201 });
   } catch (e) {
     return badRequest(e);

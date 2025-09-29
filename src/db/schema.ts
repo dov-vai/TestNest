@@ -40,9 +40,9 @@ export const topicQuestions = pgTable(
     orderIdx: integer("order_idx").notNull().default(0),
     points: integer("points").notNull().default(0),
   },
-  (tq) => ({
-    uqTopicQuestion: uniqueIndex("uq_topic_question").on(tq.topicId, tq.questionId),
-  })
+  (tq) => [
+    uniqueIndex("uq_topic_question").on(tq.topicId, tq.questionId),
+  ]
 );
 
 export const topicsRelations = relations(topics, ({ many }) => ({

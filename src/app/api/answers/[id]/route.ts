@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
-import { answers } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { getAnswerById, updateAnswer, deleteAnswer } from "@/db/queries/answers";
 import { json, badRequest, notFound, handleError } from "../../_lib/http";
-import { idParamSchema, answerUpdateSchema } from "../../_lib/validators";
+import { idParamSchema } from "../../_lib/schemas/common";
+import { answerUpdateSchema } from "../../_lib/schemas/answer";
 
 /**
  * Get answer by id
@@ -14,7 +14,7 @@ import { idParamSchema, answerUpdateSchema } from "../../_lib/validators";
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
-    const [row] = await db.select().from(answers).where(eq(answers.id, id));
+    const row = await getAnswerById(db, id);
     if (!row) return notFound("Answer not found");
     return json(row);
   } catch (e) {
@@ -34,7 +34,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const { id } = idParamSchema.parse(await context.params);
     const body = await req.json();
     const data = answerUpdateSchema.parse(body);
-    const [updated] = await db.update(answers).set(data).where(eq(answers.id, id)).returning();
+    const updated = await updateAnswer(db, id, data);
     if (!updated) return notFound("Answer not found");
     return json(updated);
   } catch (e) {
@@ -51,7 +51,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = idParamSchema.parse(await context.params);
-    const [deleted] = await db.delete(answers).where(eq(answers.id, id)).returning();
+    const deleted = await deleteAnswer(db, id);
     if (!deleted) return notFound("Answer not found");
     return json({ id: deleted.id });
   } catch (e) {

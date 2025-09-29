@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
-import { topics } from "@/db/schema";
-import { sql } from "drizzle-orm";
 import { json, badRequest, serverError } from "../_lib/http";
-import { paginationSchema, topicCreateSchema } from "../_lib/validators";
+import { paginationSchema } from "../_lib/schemas/common";
+import { topicCreateSchema } from "../_lib/schemas/topic";
+import { listTopics, createTopic } from "@/db/queries/topics";
 
 /**
  * List topics
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
 
-    const data = await db.select().from(topics).limit(limit).offset(offset).orderBy(sql`id asc`);
+    const data = await listTopics(db, { limit, offset });
     return json(data);
   } catch (e) {
     return serverError(e);
@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = topicCreateSchema.parse(body);
-    const [created] = await db.insert(topics).values(parsed).returning();
+    const created = await createTopic(db, parsed);
     return json(created, { status: 201 });
   } catch (e) {
     return badRequest(e);

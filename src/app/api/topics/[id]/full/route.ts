@@ -1,9 +1,11 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
-import { topics, topicQuestions, questions, answers } from "@/db/schema";
-import { eq, asc, inArray } from "drizzle-orm";
 import { json, badRequest, notFound } from "../../../_lib/http";
-import { idParamSchema } from "../../../_lib/validators";
+import { idParamSchema } from "../../../_lib/schemas/common";
+import { getTopicById } from "@/db/queries/topics";
+import { listTopicQuestionLinks } from "@/db/queries/topic-questions";
+import { getQuestionsByIds } from "@/db/queries/questions";
+import { listAnswersByQuestionIds } from "@/db/queries/answers";
 
 /**
  * Get topic with questions and answers
@@ -15,27 +17,15 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   try {
     const { id } = idParamSchema.parse(await context.params);
 
-    const [topic] = await db.select().from(topics).where(eq(topics.id, id));
+    const topic = await getTopicById(db, id);
     if (!topic) return notFound("Topic not found");
 
-    const tqRows = await db
-      .select()
-      .from(topicQuestions)
-      .where(eq(topicQuestions.topicId, id))
-      .orderBy(asc(topicQuestions.orderIdx));
+    const tqRows = await listTopicQuestionLinks(db, id);
 
     const questionIds = tqRows.map((tq) => tq.questionId);
-    const questionRows = questionIds.length
-      ? await db.select().from(questions).where(inArray(questions.id, questionIds as number[]))
-      : [];
+    const questionRows = await getQuestionsByIds(db, questionIds as number[]);
 
-    const answersRows = questionIds.length
-      ? await db
-          .select()
-          .from(answers)
-          .where(inArray(answers.questionId, questionIds as number[]))
-          .orderBy(asc(answers.orderIdx))
-      : [];
+    const answersRows = await listAnswersByQuestionIds(db, questionIds as number[]);
 
     const questionIdToAnswers = new Map<number, typeof answersRows>();
     for (const a of answersRows) {

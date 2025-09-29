@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db/client";
 import { topics } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import { json, badRequest, serverError } from "../_lib/http";
 import { paginationSchema, topicCreateSchema } from "../_lib/validators";
 

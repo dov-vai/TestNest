@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/db/client";
 import { questions } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { json, badRequest, notFound, serverError, handleError } from "../../_lib/http";
+import { json, badRequest, notFound, handleError } from "../../_lib/http";
 import { idParamSchema, questionUpdateSchema } from "../../_lib/validators";
 
 /**

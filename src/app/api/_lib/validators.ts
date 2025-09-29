@@ -100,7 +100,7 @@ export const deletedSchema = z.object({
 });
 
 // Full schema for topic with questions and answer
-// Generator doesn't support z.extend or spread operator so have to copy and paste it...
+// OpenAPI generator doesn't support z.extend or spread operator so have to copy and paste it...
 export const questionWithAnswersSchema = z.object({
   id: z.number().int().positive().describe("Question id"),
   text: z.string().describe("Question text"),

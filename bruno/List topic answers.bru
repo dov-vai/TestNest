@@ -1,0 +1,17 @@
+meta {
+  name: List topic answers
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/api/topics/:id/answers
+  body: none
+  auth: inherit
+}
+
+params:path {
+  id: 1
+}
+
+

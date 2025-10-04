@@ -1,5 +1,5 @@
 import { DB } from "@/db/client";
-import { Question, questions } from "@/db/schema";
+import { Question, questions, topicQuestions } from "@/db/schema";
 import { eq, asc, inArray } from "drizzle-orm";
 
 export type Pagination = { limit: number; offset: number };
@@ -38,6 +38,42 @@ export async function getQuestionsByIds(db: DB, ids: number[]): Promise<Array<Qu
   if (ids.length === 0) return [];
   const rows = await db.select().from(questions).where(inArray(questions.id, ids));
   return rows;
+}
+
+export type TopicQuestionWithQuestion = {
+  id: number;
+  topicId: number;
+  questionId: number;
+  orderIdx: number;
+  points: number;
+  question: Pick<Question, "id" | "text" | "type">;
+};
+
+export async function listQuestionsByTopicId(db: DB, topicId: number): Promise<Array<TopicQuestionWithQuestion>> {
+  const rows = await db
+    .select({
+      linkId: topicQuestions.id,
+      linkTopicId: topicQuestions.topicId,
+      linkQuestionId: topicQuestions.questionId,
+      linkOrderIdx: topicQuestions.orderIdx,
+      linkPoints: topicQuestions.points,
+      qId: questions.id,
+      qText: questions.text,
+      qType: questions.type,
+    })
+    .from(topicQuestions)
+    .innerJoin(questions, eq(topicQuestions.questionId, questions.id))
+    .where(eq(topicQuestions.topicId, topicId))
+    .orderBy(asc(topicQuestions.orderIdx));
+
+  return rows.map(r => ({
+    id: r.linkId,
+    topicId: r.linkTopicId,
+    questionId: r.linkQuestionId,
+    orderIdx: r.linkOrderIdx,
+    points: r.linkPoints,
+    question: { id: r.qId, text: r.qText, type: r.qType },
+  }));
 }
 
 

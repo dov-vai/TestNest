@@ -1,5 +1,5 @@
 import { DB } from "@/db/client";
-import { Answer, answers } from "@/db/schema";
+import { Answer, answers, topicQuestions, questions } from "@/db/schema";
 import { eq, asc, inArray } from "drizzle-orm";
 
 export type Pagination = { limit: number; offset: number };
@@ -43,6 +43,23 @@ export async function listAnswersByQuestionIds(db: DB, questionIds: number[]): P
     .select()
     .from(answers)
     .where(inArray(answers.questionId, questionIds))
+    .orderBy(asc(answers.orderIdx));
+  return rows;
+}
+
+export async function listAnswersByTopicId(db: DB, topicId: number): Promise<Array<Answer>> {
+  const rows = await db
+    .select({
+      id: answers.id,
+      questionId: answers.questionId,
+      text: answers.text,
+      isCorrect: answers.isCorrect,
+      orderIdx: answers.orderIdx,
+    })
+    .from(topicQuestions)
+    .innerJoin(questions, eq(topicQuestions.questionId, questions.id))
+    .innerJoin(answers, eq(answers.questionId, questions.id))
+    .where(eq(topicQuestions.topicId, topicId))
     .orderBy(asc(answers.orderIdx));
   return rows;
 }

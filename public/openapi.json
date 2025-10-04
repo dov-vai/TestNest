@@ -214,57 +214,6 @@
           "type"
         ]
       },
-      "topicFullSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Topic id"
-          },
-          "title": {
-            "type": "string",
-            "description": "Topic title"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true,
-            "description": "Topic description (nullable)"
-          },
-          "userId": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Creator id"
-          },
-          "isPrivate": {
-            "type": "boolean",
-            "description": "Whether topic is private"
-          },
-          "createdAt": {
-            "type": "object",
-            "description": "Created at (ISO)"
-          },
-          "updatedAt": {
-            "type": "object",
-            "description": "Updated at (ISO)"
-          },
-          "questions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/topicQuestionFullSchema"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "title",
-          "isPrivate",
-          "createdAt",
-          "updatedAt",
-          "questions"
-        ]
-      },
       "topicQuestionUpdateSchema": {
         "type": "object",
         "properties": {
@@ -357,10 +306,10 @@
           "points"
         ]
       },
-      "topicQuestionListSchema": {
+      "topicQuestionWithQuestionListSchema": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/topicQuestionSchema"
+          "$ref": "#/components/schemas/topicQuestionWithQuestionSchema"
         }
       },
       "topicSchema": {
@@ -494,42 +443,13 @@
           "offset"
         ]
       },
-      "questionWithAnswersSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Question id"
-          },
-          "text": {
-            "type": "string",
-            "description": "Question text"
-          },
-          "type": {
-            "type": "string",
-            "enum": [
-              "multi",
-              "single",
-              "true_false",
-              "fill_blank"
-            ],
-            "description": "Question type"
-          },
-          "answers": {
-            "type": "object"
-          }
-        },
-        "required": [
-          "id",
-          "text",
-          "type",
-          "answers",
-          "answers"
-        ]
+      "topicQuestionListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/topicQuestionSchema"
+        }
       },
-      "topicQuestionFullSchema": {
+      "topicQuestionWithQuestionSchema": {
         "type": "object",
         "properties": {
           "id": {
@@ -561,7 +481,12 @@
             "description": "Points"
           },
           "question": {
-            "type": "object"
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/questionSchema"
+              }
+            ],
+            "description": "Embedded question"
           }
         },
         "required": [
@@ -569,7 +494,8 @@
           "topicId",
           "questionId",
           "orderIdx",
-          "points"
+          "points",
+          "question"
         ]
       }
     },
@@ -1374,10 +1300,10 @@
         }
       }
     },
-    "/topics/{id}/full": {
+    "/topics/{id}/answers": {
       "get": {
-        "operationId": "get-topics-{id}-full",
-        "summary": "Get topic with questions and answers",
+        "operationId": "get-topics-{id}-answers",
+        "summary": "List answers for a topic (across all its questions)",
         "description": "",
         "tags": [
           "Topics"
@@ -1389,7 +1315,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/topicFullSchema"
+                  "$ref": "#/components/schemas/answerListSchema"
                 }
               }
             }
@@ -1448,7 +1374,7 @@
       },
       "get": {
         "operationId": "get-topics-{id}-questions",
-        "summary": "List topic-question links",
+        "summary": "List questions for a topic with link metadata",
         "description": "",
         "tags": [
           "Topics"
@@ -1460,7 +1386,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/topicQuestionListSchema"
+                  "$ref": "#/components/schemas/topicQuestionWithQuestionListSchema"
                 }
               }
             }

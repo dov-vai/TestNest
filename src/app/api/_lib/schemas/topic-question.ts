@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { questionSchema } from "./question";
 
 export const topicQuestionSchema = z.object({
   id: z.number().int().positive().describe("Link id"),
@@ -21,5 +22,16 @@ export const topicQuestionUpdateSchema = z.object({
   orderIdx: z.coerce.number().int().min(0).optional().describe("New order index"),
   points: z.coerce.number().int().min(0).optional().describe("New points value"),
 });
+
+export const topicQuestionWithQuestionSchema = z.object({
+  id: z.number().int().positive().describe("Link id"),
+  topicId: z.number().int().positive().describe("Topic id"),
+  questionId: z.number().int().positive().describe("Question id"),
+  orderIdx: z.number().int().min(0).describe("Order index"),
+  points: z.number().int().min(0).describe("Points"),
+  question: questionSchema.describe("Embedded question"),
+});
+
+export const topicQuestionWithQuestionListSchema = z.array(topicQuestionWithQuestionSchema);
 
 

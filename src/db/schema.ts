@@ -12,7 +12,8 @@ export const topics = pgTable("topic", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
   description: text("description"),
-  createdBy: text("created_by"),
+  userId: integer("user_id"),
+  isPrivate: boolean("is_private").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

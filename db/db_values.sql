@@ -2,11 +2,10 @@ BEGIN;
 
 TRUNCATE TABLE topic_question, answer, question, topic RESTART IDENTITY CASCADE;
 
--- Topics
-INSERT INTO topic (title, description, created_by) VALUES
-  ('Basic Math', 'Arithmetic and algebra basics', 'alice'),
-  ('World Geography', 'Capitals, continents, and countries', 'bob'),
-  ('Programming Fundamentals', 'Core CS and languages', 'carol');
+INSERT INTO topic (title, description, user_id, is_private) VALUES
+  ('Basic Math', 'Arithmetic and algebra basics', 1, false),
+  ('World Geography', 'Capitals, continents, and countries', 2, true),
+  ('Programming Fundamentals', 'Core CS and languages', 3, false);
 
 -- Questions
 INSERT INTO question (text, type) VALUES

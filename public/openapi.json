@@ -232,10 +232,14 @@
             "nullable": true,
             "description": "Topic description (nullable)"
           },
-          "createdBy": {
-            "type": "string",
+          "userId": {
+            "type": "integer",
             "nullable": true,
-            "description": "Creator identifier"
+            "description": "Creator id"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "description": "Whether topic is private"
           },
           "createdAt": {
             "type": "object",
@@ -255,6 +259,7 @@
         "required": [
           "id",
           "title",
+          "isPrivate",
           "createdAt",
           "updatedAt",
           "questions"
@@ -376,10 +381,14 @@
             "nullable": true,
             "description": "Topic description (nullable)"
           },
-          "createdBy": {
-            "type": "string",
+          "userId": {
+            "type": "integer",
             "nullable": true,
-            "description": "Creator identifier"
+            "description": "Creator id"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "description": "Whether topic is private"
           },
           "createdAt": {
             "type": "object",
@@ -393,6 +402,7 @@
         "required": [
           "id",
           "title",
+          "isPrivate",
           "createdAt",
           "updatedAt"
         ]
@@ -410,6 +420,11 @@
             "type": "string",
             "nullable": true,
             "description": "New description (nullable, optional)"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether topic is private (optional)"
           }
         }
       },
@@ -432,10 +447,15 @@
             "nullable": true,
             "description": "Optional topic description"
           },
-          "createdBy": {
-            "type": "string",
+          "userId": {
+            "type": "integer",
             "nullable": true,
-            "description": "Creator identifier (optional)"
+            "description": "Creator id (optional)"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether topic is private (optional)"
           }
         },
         "required": [

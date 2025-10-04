@@ -1,5 +1,5 @@
 meta {
-  name: Demo 200 Delete OK
+  name: Demo 204 Delete OK
   type: http
   seq: 34
 }
@@ -8,6 +8,7 @@ delete {
   url: {{baseUrl}}/api/answers/:id
   body: none
   auth: inherit
+  expectStatus: 204
 }
 
 params:path {

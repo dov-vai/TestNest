@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
 /**
  * Delete topic
- * @response 200:deletedSchema
+ * @response 204:Empty
  * @responseSet public
  * @openapi
  */
@@ -53,7 +53,7 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     const { id } = idParamSchema.parse(await context.params);
     const deleted = await deleteTopic(db, id);
     if (!deleted) return notFound("Topic not found");
-    return json({ id: deleted.id });
+    return new Response(null, { status: 204 });
   } catch (e) {
     return serverError(e);
   }

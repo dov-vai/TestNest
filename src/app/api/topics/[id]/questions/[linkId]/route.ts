@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
 
 /**
  * Unlink question from topic
- * @response 200:deletedSchema
+ * @response 204:Empty
  * @openapi
  */
 export async function DELETE(_req: NextRequest, context: { params: Promise<{ id: string; linkId: string }> }) {
@@ -38,7 +38,7 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     const { id: linkId } = idParamSchema.parse({ id: awaited.linkId });
     const deleted = await unlinkQuestionFromTopic(db, topicId, linkId);
     if (!deleted) return notFound("Link not found");
-    return json({ id: deleted.id });
+    return new Response(null, { status: 204 });
   } catch (e) {
     return handleError(e);
   }

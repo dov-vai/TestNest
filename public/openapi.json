@@ -79,20 +79,7 @@
           }
         }
       },
-      "deletedSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Deleted id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
+      "Empty": {},
       "answerListSchema": {
         "type": "array",
         "items": {
@@ -409,38 +396,6 @@
         },
         "required": [
           "title"
-        ]
-      },
-      "idParamSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Positive integer id"
-          }
-        },
-        "required": [
-          "id"
-        ]
-      },
-      "paginationSchema": {
-        "type": "object",
-        "properties": {
-          "limit": {
-            "type": "string"
-          },
-          "offset": {
-            "type": "integer",
-            "minimum": 0,
-            "default": 0,
-            "description": "Offset from start (>=0)"
-          }
-        },
-        "required": [
-          "limit",
-          "offset"
         ]
       },
       "topicQuestionListSchema": {
@@ -927,12 +882,12 @@
         ],
         "parameters": [],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/deletedSchema"
+                  "$ref": "#/components/schemas/Empty"
                 }
               }
             }
@@ -1099,12 +1054,12 @@
         ],
         "parameters": [],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/deletedSchema"
+                  "$ref": "#/components/schemas/Empty"
                 }
               }
             }
@@ -1278,12 +1233,12 @@
         ],
         "parameters": [],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/deletedSchema"
+                  "$ref": "#/components/schemas/Empty"
                 }
               }
             }
@@ -1452,12 +1407,12 @@
         ],
         "parameters": [],
         "responses": {
-          "200": {
+          "204": {
             "description": "Successful response",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/deletedSchema"
+                  "$ref": "#/components/schemas/Empty"
                 }
               }
             }

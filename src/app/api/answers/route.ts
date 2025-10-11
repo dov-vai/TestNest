@@ -1,9 +1,10 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
-import { json, badRequest, serverError } from '../_lib/http';
+import { json, badRequest, serverError, notFound } from '../_lib/http';
 import { paginationSchema } from '../_lib/schemas/common';
 import { answerCreateSchema } from '../_lib/schemas/answer';
 import { listAnswers, createAnswer } from '@/db/queries/answers';
+import { getQuestionById } from '@/db/queries/questions';
 
 /**
  * List answers
@@ -38,6 +39,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const parsed = answerCreateSchema.parse(body);
+
+    const question = await getQuestionById(db, parsed.questionId);
+
+    if (!question) {
+      return notFound(`Question with id ${parsed.questionId} does not exist`);
+    }
+
     const created = await createAnswer(db, parsed);
     return json(created, { status: 201 });
   } catch (e) {

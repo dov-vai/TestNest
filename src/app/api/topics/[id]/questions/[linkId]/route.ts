@@ -4,6 +4,7 @@ import { updateTopicQuestionLink, unlinkQuestionFromTopic } from '@/db/queries/t
 import { json, badRequest, notFound, handleError } from '../../../../_lib/http';
 import { idParamSchema } from '../../../../_lib/schemas/common';
 import { topicQuestionUpdateSchema } from '../../../../_lib/schemas/topic-question';
+import { getTopicById } from '@/db/queries/topics';
 
 /**
  * Update topic-question link
@@ -16,6 +17,12 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const awaited = await context.params;
     const { id: topicId } = idParamSchema.parse({ id: awaited.id });
     const { id: linkId } = idParamSchema.parse({ id: awaited.linkId });
+
+    const topic = await getTopicById(db, topicId);
+    if (!topic) {
+      return notFound(`Topic not found`);
+    }
+
     const body = await req.json();
     const data = topicQuestionUpdateSchema.parse(body);
     const updated = await updateTopicQuestionLink(db, topicId, linkId, data);
@@ -36,6 +43,12 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     const awaited = await context.params;
     const { id: topicId } = idParamSchema.parse({ id: awaited.id });
     const { id: linkId } = idParamSchema.parse({ id: awaited.linkId });
+
+    const topic = await getTopicById(db, topicId);
+    if (!topic) {
+      return notFound(`Topic not found`);
+    }
+
     const deleted = await unlinkQuestionFromTopic(db, topicId, linkId);
     if (!deleted) return notFound('Link not found');
     return new Response(null, { status: 204 });

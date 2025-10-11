@@ -47,3 +47,11 @@ export async function unlinkQuestionFromTopic(db: DB, topicId: number, linkId: n
     .returning();
   return deleted ?? null;
 }
+
+export async function getTopicQuestionLink(db: DB, topicId: number, questionId: number) {
+  const [row] = await db
+    .select()
+    .from(topicQuestions)
+    .where(and(eq(topicQuestions.topicId, topicId), eq(topicQuestions.questionId, questionId)));
+  return row ?? null;
+}

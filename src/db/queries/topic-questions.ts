@@ -1,13 +1,16 @@
-import { DB } from "@/db/client";
-import { topicQuestions } from "@/db/schema";
-import { and, asc, eq } from "drizzle-orm";
+import { DB } from '@/db/client';
+import { topicQuestions } from '@/db/schema';
+import { and, asc, eq } from 'drizzle-orm';
 
-export async function linkQuestionToTopic(db: DB, data: {
-  topicId: number;
-  questionId: number;
-  orderIdx?: number;
-  points?: number;
-}) {
+export async function linkQuestionToTopic(
+  db: DB,
+  data: {
+    topicId: number;
+    questionId: number;
+    orderIdx?: number;
+    points?: number;
+  }
+) {
   const [created] = await db.insert(topicQuestions).values(data).returning();
   return created;
 }
@@ -20,10 +23,15 @@ export async function listTopicQuestionLinks(db: DB, topicId: number) {
     .orderBy(asc(topicQuestions.orderIdx));
 }
 
-export async function updateTopicQuestionLink(db: DB, topicId: number, linkId: number, data: {
-  orderIdx?: number;
-  points?: number;
-}) {
+export async function updateTopicQuestionLink(
+  db: DB,
+  topicId: number,
+  linkId: number,
+  data: {
+    orderIdx?: number;
+    points?: number;
+  }
+) {
   const [updated] = await db
     .update(topicQuestions)
     .set(data)
@@ -39,5 +47,3 @@ export async function unlinkQuestionFromTopic(db: DB, topicId: number, linkId: n
     .returning();
   return deleted ?? null;
 }
-
-

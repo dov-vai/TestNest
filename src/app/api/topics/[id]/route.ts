@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
-import { db } from "@/db/client";
-import { getTopicById, updateTopic, deleteTopic } from "@/db/queries/topics";
-import { json, badRequest, notFound, serverError } from "../../_lib/http";
-import { idParamSchema } from "../../_lib/schemas/common";
-import { topicUpdateSchema } from "../../_lib/schemas/topic";
+import { NextRequest } from 'next/server';
+import { db } from '@/db/client';
+import { getTopicById, updateTopic, deleteTopic } from '@/db/queries/topics';
+import { json, badRequest, notFound, serverError } from '../../_lib/http';
+import { idParamSchema } from '../../_lib/schemas/common';
+import { topicUpdateSchema } from '../../_lib/schemas/topic';
 
 /**
  * Get topic by id
@@ -15,7 +15,7 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
   try {
     const { id } = idParamSchema.parse(await context.params);
     const row = await getTopicById(db, id);
-    if (!row) return notFound("Topic not found");
+    if (!row) return notFound('Topic not found');
     return json(row);
   } catch (e) {
     return badRequest(e);
@@ -35,7 +35,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     const body = await req.json();
     const data = topicUpdateSchema.parse(body);
     const updated = await updateTopic(db, id, data);
-    if (!updated) return notFound("Topic not found");
+    if (!updated) return notFound('Topic not found');
     return json(updated);
   } catch (e) {
     return badRequest(e);
@@ -52,10 +52,9 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
   try {
     const { id } = idParamSchema.parse(await context.params);
     const deleted = await deleteTopic(db, id);
-    if (!deleted) return notFound("Topic not found");
+    if (!deleted) return notFound('Topic not found');
     return new Response(null, { status: 204 });
   } catch (e) {
     return serverError(e);
   }
 }
-

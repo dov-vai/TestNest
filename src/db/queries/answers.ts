@@ -1,6 +1,6 @@
-import { DB } from "@/db/client";
-import { Answer, answers, topicQuestions, questions } from "@/db/schema";
-import { eq, asc, inArray } from "drizzle-orm";
+import { DB } from '@/db/client';
+import { Answer, answers, topicQuestions, questions } from '@/db/schema';
+import { eq, asc, inArray } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
@@ -8,12 +8,15 @@ export async function listAnswers(db: DB, { limit, offset }: Pagination) {
   return db.select().from(answers).limit(limit).offset(offset).orderBy(asc(answers.id));
 }
 
-export async function createAnswer(db: DB, data: {
-  questionId: number;
-  text: string;
-  isCorrect?: boolean;
-  orderIdx?: number;
-}) {
+export async function createAnswer(
+  db: DB,
+  data: {
+    questionId: number;
+    text: string;
+    isCorrect?: boolean;
+    orderIdx?: number;
+  }
+) {
   const [created] = await db.insert(answers).values(data).returning();
   return created;
 }
@@ -23,11 +26,15 @@ export async function getAnswerById(db: DB, id: number) {
   return row ?? null;
 }
 
-export async function updateAnswer(db: DB, id: number, data: {
-  text?: string;
-  isCorrect?: boolean;
-  orderIdx?: number;
-}) {
+export async function updateAnswer(
+  db: DB,
+  id: number,
+  data: {
+    text?: string;
+    isCorrect?: boolean;
+    orderIdx?: number;
+  }
+) {
   const [updated] = await db.update(answers).set(data).where(eq(answers.id, id)).returning();
   return updated ?? null;
 }
@@ -63,5 +70,3 @@ export async function listAnswersByTopicId(db: DB, topicId: number): Promise<Arr
     .orderBy(asc(answers.orderIdx));
   return rows;
 }
-
-

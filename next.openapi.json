@@ -22,23 +22,9 @@
   },
   "defaultResponseSet": "common",
   "responseSets": {
-    "common": [
-      "400",
-      "422",
-      "500"
-    ],
-    "auth": [
-      "400",
-      "401",
-      "403",
-      "422",
-      "500"
-    ],
-    "public": [
-      "400",
-      "422",
-      "500"
-    ]
+    "common": ["400", "422", "500"],
+    "auth": ["400", "401", "403", "422", "500"],
+    "public": ["400", "422", "500"]
   },
   "errorConfig": {
     "template": {
@@ -48,9 +34,21 @@
         "issues": {
           "type": "object",
           "nullable": true,
-          "example": { "body": [{ "code": "invalid_type", "message": "Expected string, received number", "path": ["text"] }] }
+          "example": {
+            "body": [
+              {
+                "code": "invalid_type",
+                "message": "Expected string, received number",
+                "path": ["text"]
+              }
+            ]
+          }
         },
-        "detail": { "type": "string", "nullable": true, "example": "Additional error details" }
+        "detail": {
+          "type": "string",
+          "nullable": true,
+          "example": "Additional error details"
+        }
       },
       "required": ["error"]
     },

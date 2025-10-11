@@ -1,6 +1,6 @@
-import { DB } from "@/db/client";
-import { Question, questions, topicQuestions } from "@/db/schema";
-import { eq, asc, inArray } from "drizzle-orm";
+import { DB } from '@/db/client';
+import { Question, questions, topicQuestions } from '@/db/schema';
+import { eq, asc, inArray } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
@@ -8,10 +8,13 @@ export async function listQuestions(db: DB, { limit, offset }: Pagination) {
   return db.select().from(questions).limit(limit).offset(offset).orderBy(asc(questions.id));
 }
 
-export async function createQuestion(db: DB, data: {
-  text: string;
-  type: "multi" | "single" | "true_false" | "fill_blank";
-}) {
+export async function createQuestion(
+  db: DB,
+  data: {
+    text: string;
+    type: 'multi' | 'single' | 'true_false' | 'fill_blank';
+  }
+) {
   const [created] = await db.insert(questions).values(data).returning();
   return created;
 }
@@ -21,10 +24,14 @@ export async function getQuestionById(db: DB, id: number) {
   return row ?? null;
 }
 
-export async function updateQuestion(db: DB, id: number, data: {
-  text?: string;
-  type?: "multi" | "single" | "true_false" | "fill_blank";
-}) {
+export async function updateQuestion(
+  db: DB,
+  id: number,
+  data: {
+    text?: string;
+    type?: 'multi' | 'single' | 'true_false' | 'fill_blank';
+  }
+) {
   const [updated] = await db.update(questions).set(data).where(eq(questions.id, id)).returning();
   return updated ?? null;
 }
@@ -46,7 +53,7 @@ export type TopicQuestionWithQuestion = {
   questionId: number;
   orderIdx: number;
   points: number;
-  question: Pick<Question, "id" | "text" | "type">;
+  question: Pick<Question, 'id' | 'text' | 'type'>;
 };
 
 export async function listQuestionsByTopicId(db: DB, topicId: number): Promise<Array<TopicQuestionWithQuestion>> {
@@ -66,7 +73,7 @@ export async function listQuestionsByTopicId(db: DB, topicId: number): Promise<A
     .where(eq(topicQuestions.topicId, topicId))
     .orderBy(asc(topicQuestions.orderIdx));
 
-  return rows.map(r => ({
+  return rows.map((r) => ({
     id: r.linkId,
     topicId: r.linkTopicId,
     questionId: r.linkQuestionId,
@@ -75,5 +82,3 @@ export async function listQuestionsByTopicId(db: DB, topicId: number): Promise<A
     question: { id: r.qId, text: r.qText, type: r.qType },
   }));
 }
-
-

@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
-import { db } from "@/db/client";
-import { json, badRequest, serverError } from "../_lib/http";
-import { paginationSchema } from "../_lib/schemas/common";
-import { answerCreateSchema } from "../_lib/schemas/answer";
-import { listAnswers, createAnswer } from "@/db/queries/answers";
+import { NextRequest } from 'next/server';
+import { db } from '@/db/client';
+import { json, badRequest, serverError } from '../_lib/http';
+import { paginationSchema } from '../_lib/schemas/common';
+import { answerCreateSchema } from '../_lib/schemas/answer';
+import { listAnswers, createAnswer } from '@/db/queries/answers';
 
 /**
  * List answers
@@ -15,8 +15,8 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const parsed = paginationSchema.safeParse({
-      limit: searchParams.get("limit"),
-      offset: searchParams.get("offset"),
+      limit: searchParams.get('limit'),
+      offset: searchParams.get('offset'),
     });
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
@@ -44,4 +44,3 @@ export async function POST(req: NextRequest) {
     return badRequest(e);
   }
 }
-

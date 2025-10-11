@@ -1,10 +1,10 @@
-import { NextRequest } from "next/server";
-import { db } from "@/db/client";
-import { linkQuestionToTopic } from "@/db/queries/topic-questions";
-import { json, badRequest } from "../../../_lib/http";
-import { idParamSchema } from "../../../_lib/schemas/common";
-import { topicQuestionLinkSchema } from "../../../_lib/schemas/topic-question";
-import { listQuestionsByTopicId } from "@/db/queries/questions";
+import { NextRequest } from 'next/server';
+import { db } from '@/db/client';
+import { linkQuestionToTopic } from '@/db/queries/topic-questions';
+import { json, badRequest } from '../../../_lib/http';
+import { idParamSchema } from '../../../_lib/schemas/common';
+import { topicQuestionLinkSchema } from '../../../_lib/schemas/topic-question';
+import { listQuestionsByTopicId } from '@/db/queries/questions';
 
 /**
  * Link question to topic
@@ -39,4 +39,3 @@ export async function GET(_req: NextRequest, context: { params: Promise<{ id: st
     return badRequest(e);
   }
 }
-

@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { INT32_MAX } from './constants';
 
 export const questionSchema = z.object({
-  id: z.number().int().positive().describe('Question id'),
+  id: z.number().int().positive().max(INT32_MAX).describe('Question id'),
   text: z.string().describe('Question text'),
   type: z.enum(['multi', 'single', 'true_false', 'fill_blank']).describe('Question type'),
 });

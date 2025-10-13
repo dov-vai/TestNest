@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
 import { getTopicById, updateTopic, deleteTopic } from '@/db/queries/topics';
-import { json, badRequest, notFound, serverError } from '../../_lib/http';
+import { json, badRequest, notFound, handleError } from '../../_lib/http';
 import { idParamSchema } from '../../_lib/schemas/common';
 import { topicUpdateSchema } from '../../_lib/schemas/topic';
 
@@ -55,6 +55,6 @@ export async function DELETE(_req: NextRequest, context: { params: Promise<{ id:
     if (!deleted) return notFound('Topic not found');
     return new Response(null, { status: 204 });
   } catch (e) {
-    return serverError(e);
+    return handleError(e);
   }
 }

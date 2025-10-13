@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
     const question = await getQuestionById(db, parsed.questionId);
 
     if (!question) {
-      return notFound(`Question with id ${parsed.questionId} does not exist`);
+      return notFound(`Question not found`);
     }
 
     const created = await createAnswer(db, parsed);

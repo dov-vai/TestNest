@@ -1,0 +1,36 @@
+meta {
+  name: User - Cannot Update Others Topic
+  type: http
+  seq: 305
+}
+
+patch {
+  url: {{baseUrl}}/api/topics/{{adminTopicId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+body:json {
+  {
+    "title": "Trying to update admin's topic"
+  }
+}
+
+tests {
+  test("should return 403 status", function() {
+    expect(res.status).to.equal(403);
+  });
+  
+  test("should return forbidden message", function() {
+    expect(res.body).to.have.property("error");
+  });
+}
+
+docs {
+  Regular user cannot update topics they don't own.
+  Set adminTopicId variable to test.
+}

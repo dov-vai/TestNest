@@ -26,6 +26,18 @@ export async function getAnswerById(db: DB, id: number) {
   return row ?? null;
 }
 
+export async function getAnswerWithQuestion(db: DB, id: number) {
+  const [row] = await db
+    .select({
+      answer: answers,
+      question: questions,
+    })
+    .from(answers)
+    .innerJoin(questions, eq(answers.questionId, questions.id))
+    .where(eq(answers.id, id));
+  return row ?? null;
+}
+
 export async function updateAnswer(
   db: DB,
   id: number,

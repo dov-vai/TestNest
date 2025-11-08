@@ -1,11 +1,12 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
 import { getTopicQuestionLink, linkQuestionToTopic } from '@/db/queries/topic-questions';
-import { json, badRequest, notFound } from '../../../_lib/http';
+import { json, badRequest, notFound, unauthorized, forbidden } from '../../../_lib/http';
 import { idParamSchema } from '../../../_lib/schemas/common';
 import { topicQuestionLinkSchema } from '../../../_lib/schemas/topic-question';
 import { getQuestionById, listQuestionsByTopicId } from '@/db/queries/questions';
 import { getTopicById } from '@/db/queries/topics';
+import { authenticate, requireAuth, isAdmin } from '../../../_lib/middleware';
 
 /**
  * Link question to topic
@@ -15,11 +16,17 @@ import { getTopicById } from '@/db/queries/topics';
  */
 export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const user = await requireAuth(req);
     const { id: topicId } = idParamSchema.parse(await context.params);
 
     const topic = await getTopicById(db, topicId);
     if (!topic) {
       return notFound(`Topic not found`);
+    }
+
+    // Check if user owns the topic or is admin
+    if (topic.userId !== user.userId && !isAdmin(user)) {
+      return forbidden('You do not have permission to link questions to this topic');
     }
 
     const body = await req.json();
@@ -38,6 +45,9 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     const created = await linkQuestionToTopic(db, data);
     return json(created, { status: 201 });
   } catch (e) {
+    if (e instanceof Error && e.message === 'Unauthorized') {
+      return unauthorized();
+    }
     return badRequest(e);
   }
 }
@@ -45,16 +55,21 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
 /**
  * List questions for a topic with link metadata
  * @response 200:topicQuestionWithQuestionListSchema
- * @responseSet public
  * @openapi
  */
-export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const user = await authenticate(req);
     const { id: topicId } = idParamSchema.parse(await context.params);
 
     const topic = await getTopicById(db, topicId);
     if (!topic) {
       return notFound(`Topic not found`);
+    }
+
+    // Check if user has access to private topic
+    if (topic.isPrivate && (!user || (user.userId !== topic.userId && !isAdmin(user)))) {
+      return forbidden('You do not have access to this private topic');
     }
 
     const questions = await listQuestionsByTopicId(db, topicId);

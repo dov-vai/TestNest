@@ -1,0 +1,32 @@
+meta {
+  name: Admin - Get User Details
+  type: http
+  seq: 406
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users/{{targetUserId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return user details", function() {
+    expect(res.body).to.have.property("id");
+    expect(res.body).to.have.property("email");
+    expect(res.body).to.not.have.property("passwordHash");
+  });
+}
+
+docs {
+  Admin can view details of any user.
+  Set targetUserId variable to the user ID you want to view.
+}

@@ -4,11 +4,41 @@ EXCEPTION
   WHEN duplicate_object THEN NULL;
 END $$;
 
+DO $$ BEGIN
+  CREATE TYPE user_role AS ENUM ('user', 'admin');
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+
+CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  email TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
+  name TEXT,
+  role user_role NOT NULL DEFAULT 'user',
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  revoked_at TIMESTAMPTZ,
+  replaced_by_token TEXT
+);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user_id ON refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_token ON refresh_tokens(token);
+
 CREATE TABLE IF NOT EXISTS topic (
   id SERIAL PRIMARY KEY,
   title TEXT NOT NULL,
   description TEXT,
-  user_id INTEGER,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   is_private BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -17,7 +47,10 @@ CREATE TABLE IF NOT EXISTS topic (
 CREATE TABLE IF NOT EXISTS question (
   id SERIAL PRIMARY KEY,
   text TEXT NOT NULL,
-  type question_type NOT NULL
+  type question_type NOT NULL,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS answer (
@@ -48,9 +81,21 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS users_set_updated_at ON users;
+CREATE TRIGGER users_set_updated_at
+BEFORE UPDATE ON users
+FOR EACH ROW
+EXECUTE PROCEDURE set_updated_at();
+
 DROP TRIGGER IF EXISTS topic_set_updated_at ON topic;
 CREATE TRIGGER topic_set_updated_at
 BEFORE UPDATE ON topic
+FOR EACH ROW
+EXECUTE PROCEDURE set_updated_at();
+
+DROP TRIGGER IF EXISTS question_set_updated_at ON question;
+CREATE TRIGGER question_set_updated_at
+BEFORE UPDATE ON question
 FOR EACH ROW
 EXECUTE PROCEDURE set_updated_at();
 

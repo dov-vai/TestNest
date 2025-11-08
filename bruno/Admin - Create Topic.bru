@@ -1,0 +1,38 @@
+meta {
+  name: Admin - Create Topic
+  type: http
+  seq: 400
+}
+
+post {
+  url: {{baseUrl}}/api/topics
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+body:json {
+  {
+    "title": "Admin's Topic",
+    "description": "Created by admin",
+    "isPrivate": true
+  }
+}
+
+tests {
+  test("should return 201 status", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return created topic", function() {
+    expect(res.body).to.have.property("id");
+    bru.setVar("adminTopicId", res.body.id);
+  });
+}
+
+docs {
+  Admin can create topics (both public and private).
+}

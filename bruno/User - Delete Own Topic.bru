@@ -1,0 +1,25 @@
+meta {
+  name: User - Delete Own Topic
+  type: http
+  seq: 304
+}
+
+delete {
+  url: {{baseUrl}}/api/topics/{{userPublicTopicId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+tests {
+  test("should return 204 status", function() {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  Regular user can delete their own topics.
+}

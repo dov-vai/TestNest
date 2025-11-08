@@ -13,6 +13,7 @@ export async function createQuestion(
   data: {
     text: string;
     type: 'multi' | 'single' | 'true_false' | 'fill_blank';
+    userId: number;
   }
 ) {
   const [created] = await db.insert(questions).values(data).returning();

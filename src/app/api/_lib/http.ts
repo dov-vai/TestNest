@@ -22,6 +22,14 @@ export function methodNotAllowed(method: string): Response {
   return json({ error: `${method} not allowed` }, { status: 405 });
 }
 
+export function unauthorized(message = 'Unauthorized'): Response {
+  return json({ error: message }, { status: 401 });
+}
+
+export function forbidden(message = 'Forbidden'): Response {
+  return json({ error: message }, { status: 403 });
+}
+
 export function serverError(error: unknown): Response {
   return json({ error: 'Internal Server Error', detail: String(error) }, { status: 500 });
 }

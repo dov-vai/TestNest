@@ -1,0 +1,36 @@
+meta {
+  name: Admin - Block User (Set Inactive)
+  type: http
+  seq: 407
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/{{targetUserId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+body:json {
+  {
+    "isActive": false
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return updated user with isActive=false", function() {
+    expect(res.body.isActive).to.equal(false);
+  });
+}
+
+docs {
+  Admin can block/deactivate a user account by setting isActive to false.
+  Blocked users cannot login.
+}

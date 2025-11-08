@@ -1,26 +1,33 @@
 BEGIN;
 
-TRUNCATE TABLE topic_question, answer, question, topic RESTART IDENTITY CASCADE;
+TRUNCATE TABLE topic_question, answer, question, topic, users RESTART IDENTITY CASCADE;
 
+-- Users (password is 'password123' hashed with bcrypt)
+INSERT INTO users (email, password_hash, name, role, is_active) VALUES
+  ('user1@example.com', '$2b$10$rQZ8vZ8vZ8vZ8vZ8vZ8vZ.abcdefghijklmnopqrstuvwxyz1234', 'Alice Johnson', 'user', true),
+  ('user2@example.com', '$2b$10$rQZ8vZ8vZ8vZ8vZ8vZ8vZ.abcdefghijklmnopqrstuvwxyz1234', 'Bob Smith', 'user', true),
+  ('admin@example.com', '$2b$10$rQZ8vZ8vZ8vZ8vZ8vZ8vZ.abcdefghijklmnopqrstuvwxyz1234', 'Charlie Admin', 'admin', true);
+
+-- Topics
 INSERT INTO topic (title, description, user_id, is_private) VALUES
   ('Basic Math', 'Arithmetic and algebra basics', 1, false),
   ('World Geography', 'Capitals, continents, and countries', 2, true),
   ('Programming Fundamentals', 'Core CS and languages', 3, false);
 
 -- Questions
-INSERT INTO question (text, type) VALUES
-  ('What is 2 + 2?', 'single'),                                   -- id 1
-  ('Select all prime numbers.', 'multi'),                          -- id 2
-  ('Zero is an even number.', 'true_false'),                       -- id 3
-  ('The derivative of x^2 is __.', 'fill_blank'),                  -- id 4
-  ('What is the capital of France?', 'single'),                    -- id 5
-  ('Select all countries in South America.', 'multi'),             -- id 6
-  ('The equator passes through Brazil.', 'true_false'),            -- id 7
-  ('The largest ocean on Earth is the __ Ocean.', 'fill_blank'),  -- id 8
-  ('Which language runs in a web browser?', 'single'),             -- id 9
-  ('Which of the following are statically typed languages?', 'multi'), -- id 10
-  ('In Git, "merge" combines the histories of branches.', 'true_false'), -- id 11
-  ('The time complexity of binary search is O(__).', 'fill_blank');     -- id 12
+INSERT INTO question (text, type, user_id) VALUES
+  ('What is 2 + 2?', 'single', 1),                                   -- id 1
+  ('Select all prime numbers.', 'multi', 1),                          -- id 2
+  ('Zero is an even number.', 'true_false', 1),                       -- id 3
+  ('The derivative of x^2 is __.', 'fill_blank', 1),                  -- id 4
+  ('What is the capital of France?', 'single', 2),                    -- id 5
+  ('Select all countries in South America.', 'multi', 2),             -- id 6
+  ('The equator passes through Brazil.', 'true_false', 2),            -- id 7
+  ('The largest ocean on Earth is the __ Ocean.', 'fill_blank', 2),  -- id 8
+  ('Which language runs in a web browser?', 'single', 3),             -- id 9
+  ('Which of the following are statically typed languages?', 'multi', 3), -- id 10
+  ('In Git, "merge" combines the histories of branches.', 'true_false', 3), -- id 11
+  ('The time complexity of binary search is O(__).', 'fill_blank', 3);     -- id 12
 
 -- Answers
 -- Q1

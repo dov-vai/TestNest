@@ -1,0 +1,27 @@
+meta {
+  name: Admin - Delete User
+  type: http
+  seq: 411
+}
+
+delete {
+  url: {{baseUrl}}/api/admin/users/{{targetUserId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+tests {
+  test("should return 204 status", function() {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  Admin can permanently delete a user account.
+  This will cascade delete all related data (topics, etc).
+  Set targetUserId variable to the user ID you want to delete.
+}

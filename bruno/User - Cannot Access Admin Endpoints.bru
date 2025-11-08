@@ -1,0 +1,29 @@
+meta {
+  name: User - Cannot Access Admin Endpoints
+  type: http
+  seq: 307
+}
+
+get {
+  url: {{baseUrl}}/api/admin/users
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+tests {
+  test("should return 403 status", function() {
+    expect(res.status).to.equal(403);
+  });
+  
+  test("should return forbidden message", function() {
+    expect(res.body).to.have.property("error");
+  });
+}
+
+docs {
+  Regular user cannot access admin-only endpoints.
+}

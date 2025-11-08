@@ -1,15 +1,15 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
-import { json, badRequest, serverError, notFound } from '../_lib/http';
+import { json, badRequest, serverError, notFound, unauthorized, forbidden } from '../_lib/http';
 import { paginationSchema } from '../_lib/schemas/common';
 import { answerCreateSchema } from '../_lib/schemas/answer';
 import { listAnswers, createAnswer } from '@/db/queries/answers';
 import { getQuestionById } from '@/db/queries/questions';
+import { requireAuth, isAdmin } from '../_lib/middleware';
 
 /**
  * List answers
  * @response 200:answerListSchema
- * @responseSet public
  * @openapi
  */
 export async function GET(req: NextRequest) {
@@ -37,6 +37,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAuth(req);
     const body = await req.json();
     const parsed = answerCreateSchema.parse(body);
 
@@ -46,9 +47,17 @@ export async function POST(req: NextRequest) {
       return notFound(`Question not found`);
     }
 
+    // Check if user owns the question or is admin
+    if (question.userId !== user.userId && !isAdmin(user)) {
+      return forbidden('You do not have permission to add answers to this question');
+    }
+
     const created = await createAnswer(db, parsed);
     return json(created, { status: 201 });
   } catch (e) {
+    if (e instanceof Error && e.message === 'Unauthorized') {
+      return unauthorized();
+    }
     return badRequest(e);
   }
 }

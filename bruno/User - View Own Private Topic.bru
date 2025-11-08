@@ -1,0 +1,30 @@
+meta {
+  name: User - View Own Private Topic
+  type: http
+  seq: 302
+}
+
+get {
+  url: {{baseUrl}}/api/topics/{{userPrivateTopicId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return private topic", function() {
+    expect(res.body).to.have.property("id");
+    expect(res.body.isPrivate).to.equal(true);
+  });
+}
+
+docs {
+  Regular user can view their own private topics.
+}

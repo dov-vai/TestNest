@@ -1,0 +1,43 @@
+meta {
+  name: Auth - Register User
+  type: http
+  seq: 100
+}
+
+post {
+  url: {{baseUrl}}/api/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "user@example.com",
+    "password": "User123!",
+    "name": "Regular User"
+  }
+}
+
+tests {
+  test("should return 201 status", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return user with role", function() {
+    expect(res.body.user).to.have.property("role");
+    expect(res.body.user.role).to.equal("user");
+  });
+  
+  test("should return access token", function() {
+    expect(res.body).to.have.property("accessToken");
+  });
+  
+  test("should return refresh token", function() {
+    expect(res.body).to.have.property("refreshToken");
+  });
+}
+
+docs {
+  Register a new regular user account.
+  Default role is 'user'.
+}

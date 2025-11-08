@@ -1,0 +1,26 @@
+meta {
+  name: Guest - Cannot Access Private Topic
+  type: http
+  seq: 202
+}
+
+get {
+  url: {{baseUrl}}/api/topics/{{privateTopicId}}
+  body: none
+  auth: none
+}
+
+tests {
+  test("should return 403 status", function() {
+    expect(res.status).to.equal(403);
+  });
+  
+  test("should return forbidden message", function() {
+    expect(res.body).to.have.property("error");
+  });
+}
+
+docs {
+  Guest cannot access private topics.
+  Set privateTopicId variable to a private topic ID to test.
+}

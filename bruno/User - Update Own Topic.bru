@@ -1,0 +1,36 @@
+meta {
+  name: User - Update Own Topic
+  type: http
+  seq: 303
+}
+
+patch {
+  url: {{baseUrl}}/api/topics/{{userPublicTopicId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+body:json {
+  {
+    "title": "Updated User Topic",
+    "description": "Updated by owner"
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return updated topic", function() {
+    expect(res.body.title).to.equal("Updated User Topic");
+  });
+}
+
+docs {
+  Regular user can update their own topics.
+}

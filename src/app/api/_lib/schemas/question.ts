@@ -5,6 +5,9 @@ export const questionSchema = z.object({
   id: z.number().int().positive().max(INT32_MAX).describe('Question id'),
   text: z.string().describe('Question text'),
   type: z.enum(['multi', 'single', 'true_false', 'fill_blank']).describe('Question type'),
+  userId: z.number().int().positive().max(INT32_MAX).describe('User id who created the question'),
+  createdAt: z.date().describe('Creation timestamp'),
+  updatedAt: z.date().describe('Last update timestamp'),
 });
 
 export const questionListSchema = z.array(questionSchema);

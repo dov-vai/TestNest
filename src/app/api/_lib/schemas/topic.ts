@@ -16,7 +16,6 @@ export const topicListSchema = z.array(topicSchema);
 export const topicCreateSchema = z.object({
   title: z.string().min(1).describe('Topic title'),
   description: z.string().optional().describe('Optional topic description'),
-  userId: z.coerce.number().int().max(INT32_MAX).optional().describe('Creator id (optional)'),
   isPrivate: z.boolean().optional().describe('Whether topic is private (optional)'),
 });
 

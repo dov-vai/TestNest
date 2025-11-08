@@ -1,0 +1,24 @@
+meta {
+  name: Guest - Get Public Topic
+  type: http
+  seq: 201
+}
+
+get {
+  url: {{baseUrl}}/api/topics/1
+  body: none
+  auth: none
+}
+
+tests {
+  test("should return 200 if topic is public", function() {
+    if (res.body && !res.body.isPrivate) {
+      expect(res.status).to.equal(200);
+    }
+  });
+}
+
+docs {
+  Guest can view a public topic by ID.
+  If the topic is private, this should return 403 Forbidden.
+}

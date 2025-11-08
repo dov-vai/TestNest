@@ -1,11 +1,24 @@
 import { DB } from '@/db/client';
 import { topics } from '@/db/schema';
-import { eq, asc } from 'drizzle-orm';
+import { eq, asc, or, and } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
-export async function listTopics(db: DB, { limit, offset }: Pagination) {
-  return db.select().from(topics).limit(limit).offset(offset).orderBy(asc(topics.id));
+export async function listTopics(db: DB, { limit, offset }: Pagination, userId?: number, isAdmin?: boolean) {
+  // Admins can see all topics
+  // If user is authenticated (non-admin), show public topics + their own private topics
+  // If not authenticated, show only public topics
+  const whereClause = isAdmin
+    ? undefined // No filter for admins - show all topics
+    : userId
+      ? or(eq(topics.isPrivate, false), and(eq(topics.userId, userId), eq(topics.isPrivate, true)))
+      : eq(topics.isPrivate, false);
+
+  const query = db.select().from(topics);
+  
+  return whereClause 
+    ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(topics.id))
+    : query.limit(limit).offset(offset).orderBy(asc(topics.id));
 }
 
 export async function createTopic(
@@ -13,7 +26,7 @@ export async function createTopic(
   data: {
     title: string;
     description?: string | null;
-    userId?: number | null;
+    userId: number;
     isPrivate?: boolean;
   }
 ) {

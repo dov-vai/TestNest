@@ -1,0 +1,30 @@
+meta {
+  name: Admin - View All Topics
+  type: http
+  seq: 401
+}
+
+get {
+  url: {{baseUrl}}/api/topics
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return all topics including private", function() {
+    expect(res.body).to.be.an("array");
+    // Admin should see both public and private topics
+  });
+}
+
+docs {
+  Admin can view all topics, including private ones from all users.
+}

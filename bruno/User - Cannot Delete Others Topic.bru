@@ -1,0 +1,30 @@
+meta {
+  name: User - Cannot Delete Others Topic
+  type: http
+  seq: 306
+}
+
+delete {
+  url: {{baseUrl}}/api/topics/{{adminTopicId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+tests {
+  test("should return 403 status", function() {
+    expect(res.status).to.equal(403);
+  });
+  
+  test("should return forbidden message", function() {
+    expect(res.body).to.have.property("error");
+  });
+}
+
+docs {
+  Regular user cannot delete topics they don't own.
+  Set adminTopicId variable to test.
+}

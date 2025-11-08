@@ -1,0 +1,35 @@
+meta {
+  name: Admin - Demote Admin to User
+  type: http
+  seq: 410
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/{{targetUserId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+body:json {
+  {
+    "role": "user"
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return updated user with role=user", function() {
+    expect(res.body.role).to.equal("user");
+  });
+}
+
+docs {
+  Admin can demote an admin user back to regular user role.
+}

@@ -1,0 +1,28 @@
+meta {
+  name: Guest - List Public Topics
+  type: http
+  seq: 200
+}
+
+get {
+  url: {{baseUrl}}/api/topics
+  body: none
+  auth: none
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return only public topics", function() {
+    expect(res.body).to.be.an("array");
+    res.body.forEach(topic => {
+      expect(topic.isPrivate).to.equal(false);
+    });
+  });
+}
+
+docs {
+  Guest (unauthenticated) user can view all public topics.
+}

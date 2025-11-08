@@ -1,14 +1,14 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
-import { json, badRequest, serverError } from '../_lib/http';
+import { json, badRequest, serverError, unauthorized } from '../_lib/http';
 import { paginationSchema } from '../_lib/schemas/common';
 import { questionCreateSchema } from '../_lib/schemas/question';
 import { listQuestions, createQuestion } from '@/db/queries/questions';
+import { requireAuth } from '../_lib/middleware';
 
 /**
  * List questions
  * @response 200:questionListSchema
- * @responseSet public
  * @openapi
  */
 export async function GET(req: NextRequest) {
@@ -36,11 +36,15 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    const user = await requireAuth(req);
     const body = await req.json();
     const parsed = questionCreateSchema.parse(body);
-    const created = await createQuestion(db, parsed);
+    const created = await createQuestion(db, { ...parsed, userId: user.userId });
     return json(created, { status: 201 });
   } catch (e) {
+    if (e instanceof Error && e.message === 'Unauthorized') {
+      return unauthorized();
+    }
     return badRequest(e);
   }
 }

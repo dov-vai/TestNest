@@ -1,0 +1,35 @@
+meta {
+  name: Admin - Promote User to Admin
+  type: http
+  seq: 409
+}
+
+patch {
+  url: {{baseUrl}}/api/admin/users/{{targetUserId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+body:json {
+  {
+    "role": "admin"
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return updated user with role=admin", function() {
+    expect(res.body.role).to.equal("admin");
+  });
+}
+
+docs {
+  Admin can promote a regular user to admin role.
+}

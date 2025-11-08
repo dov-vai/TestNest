@@ -1,0 +1,29 @@
+meta {
+  name: Guest - Cannot Create Topic
+  type: http
+  seq: 203
+}
+
+post {
+  url: {{baseUrl}}/api/topics
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "title": "Guest Topic",
+    "description": "Should fail",
+    "isPrivate": false
+  }
+}
+
+tests {
+  test("should return 401 status", function() {
+    expect(res.status).to.equal(401);
+  });
+}
+
+docs {
+  Guest cannot create topics without authentication.
+}

@@ -1,0 +1,43 @@
+meta {
+  name: Auth - Login Admin
+  type: http
+  seq: 103
+}
+
+post {
+  url: {{baseUrl}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "admin@example.com",
+    "password": "Admin123!"
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return admin user with role", function() {
+    expect(res.body.user).to.have.property("role");
+    expect(res.body.user.role).to.equal("admin");
+  });
+  
+  test("should return access token", function() {
+    expect(res.body).to.have.property("accessToken");
+    bru.setVar("adminAccessToken", res.body.accessToken);
+  });
+  
+  test("should return refresh token", function() {
+    expect(res.body).to.have.property("refreshToken");
+    bru.setVar("adminRefreshToken", res.body.refreshToken);
+  });
+}
+
+docs {
+  Login as an admin user and store the tokens for subsequent requests.
+}

@@ -1,0 +1,39 @@
+meta {
+  name: User - Create Private Topic
+  type: http
+  seq: 301
+}
+
+post {
+  url: {{baseUrl}}/api/topics
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{userAccessToken}}
+}
+
+body:json {
+  {
+    "title": "User's Private Topic",
+    "description": "Private topic for testing",
+    "isPrivate": true
+  }
+}
+
+tests {
+  test("should return 201 status", function() {
+    expect(res.status).to.equal(201);
+  });
+  
+  test("should return created private topic", function() {
+    expect(res.body).to.have.property("id");
+    expect(res.body.isPrivate).to.equal(true);
+    bru.setVar("userPrivateTopicId", res.body.id);
+  });
+}
+
+docs {
+  Regular user can create private topics.
+}

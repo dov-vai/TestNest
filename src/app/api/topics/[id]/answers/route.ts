@@ -8,7 +8,6 @@ import { getTopicById } from '@/db/queries/topics';
 /**
  * List answers for a topic (across all its questions)
  * @response 200:answerListSchema
- * @responseSet public
  * @openapi
  */
 export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {

@@ -1,0 +1,25 @@
+meta {
+  name: Admin - Delete Any Topic
+  type: http
+  seq: 404
+}
+
+delete {
+  url: {{baseUrl}}/api/topics/{{userPrivateTopicId}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+tests {
+  test("should return 204 status", function() {
+    expect(res.status).to.equal(204);
+  });
+}
+
+docs {
+  Admin can delete any user's topic, regardless of ownership.
+}

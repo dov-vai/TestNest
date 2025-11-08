@@ -1,0 +1,36 @@
+meta {
+  name: Admin - Update Any Topic
+  type: http
+  seq: 403
+}
+
+patch {
+  url: {{baseUrl}}/api/topics/{{userPrivateTopicId}}
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{adminAccessToken}}
+}
+
+body:json {
+  {
+    "title": "Updated by Admin",
+    "description": "Admin modified user's topic"
+  }
+}
+
+tests {
+  test("should return 200 status", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("should return updated topic", function() {
+    expect(res.body.title).to.equal("Updated by Admin");
+  });
+}
+
+docs {
+  Admin can update any user's topic, regardless of ownership.
+}

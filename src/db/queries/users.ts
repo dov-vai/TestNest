@@ -16,15 +16,17 @@ export async function findUserById(id: number) {
 }
 
 export async function getAllUsers() {
-  return db.select({
-    id: users.id,
-    email: users.email,
-    name: users.name,
-    role: users.role,
-    isActive: users.isActive,
-    createdAt: users.createdAt,
-    updatedAt: users.updatedAt,
-  }).from(users);
+  return db
+    .select({
+      id: users.id,
+      email: users.email,
+      name: users.name,
+      role: users.role,
+      isActive: users.isActive,
+      createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
+    })
+    .from(users);
 }
 
 export async function createUser(data: { email: string; password: string; name?: string }) {
@@ -101,6 +103,12 @@ export async function createRefreshToken(data: { userId: number; token: string; 
 
 export async function findRefreshToken(token: string) {
   const result = await db.select().from(refreshTokens).where(eq(refreshTokens.token, token)).limit(1);
+
+  return result[0] || null;
+}
+
+export async function findRefreshTokenById(tokenId: number) {
+  const result = await db.select().from(refreshTokens).where(eq(refreshTokens.id, tokenId)).limit(1);
 
   return result[0] || null;
 }

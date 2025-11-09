@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { json, handleError } from '../../_lib/http';
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, getRefreshTokenExpiry } from '@/lib/auth';
-import { findRefreshToken, revokeRefreshToken, createRefreshToken, findUserById } from '@/db/queries/users';
+import { findRefreshTokenById, revokeRefreshToken, createRefreshToken, findUserById } from '@/db/queries/users';
 
 const refreshSchema = z.object({
   refreshToken: z.string(),
@@ -19,8 +19,13 @@ export async function POST(request: NextRequest) {
       return json({ error: 'Invalid or expired refresh token' }, { status: 401 });
     }
 
-    // Find the refresh token in the database
-    const tokenRecord = await findRefreshToken(data.refreshToken);
+    // Find the refresh token in the database using the tokenId from the JWT payload
+    const tokenId = parseInt(payload.tokenId);
+    if (isNaN(tokenId)) {
+      return json({ error: 'Invalid token ID' }, { status: 401 });
+    }
+
+    const tokenRecord = await findRefreshTokenById(tokenId);
     if (!tokenRecord) {
       return json({ error: 'Refresh token not found' }, { status: 401 });
     }

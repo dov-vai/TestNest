@@ -127,4 +127,49 @@ INSERT INTO topic_question (topic_id, question_id, order_idx, points) VALUES
   (3, 12, 3, 8),
   (3, 3, 4, 2);
 
+-- User Topic Attempts
+-- User 1 completed Basic Math topic
+INSERT INTO user_topic_attempt (user_id, topic_id, started_at, submitted_at, total_points, earned_points, is_completed) VALUES
+  (1, 1, '2025-11-01 10:00:00+00', '2025-11-01 10:15:00+00', 26, 23, true);
+
+-- User 1 started but didn't complete Programming Fundamentals
+INSERT INTO user_topic_attempt (user_id, topic_id, started_at, submitted_at, total_points, earned_points, is_completed) VALUES
+  (1, 3, '2025-11-05 14:30:00+00', NULL, 28, 15, false);
+
+-- User 2 completed World Geography topic
+INSERT INTO user_topic_attempt (user_id, topic_id, started_at, submitted_at, total_points, earned_points, is_completed) VALUES
+  (2, 2, '2025-11-03 09:00:00+00', '2025-11-03 09:20:00+00', 26, 26, true);
+
+-- User 2 completed Basic Math topic
+INSERT INTO user_topic_attempt (user_id, topic_id, started_at, submitted_at, total_points, earned_points, is_completed) VALUES
+  (2, 1, '2025-11-06 11:00:00+00', '2025-11-06 11:12:00+00', 26, 18, true);
+
+-- User Answers
+-- Attempt 1 (User 1, Basic Math, Completed) - topic_question ids: 1,2,3,4
+INSERT INTO user_answer (attempt_id, topic_question_id, answer_id, user_answer_text, is_correct, points_awarded, answered_at) VALUES
+  (1, 1, 1, NULL, true, 5, '2025-11-01 10:02:00+00'),   -- Q1: 2+2=4, correct
+  (1, 2, 4, NULL, true, 10, '2025-11-01 10:05:00+00'),  -- Q2: Selected 2 (prime), correct
+  (1, 3, 8, NULL, true, 3, '2025-11-01 10:08:00+00'),   -- Q3: Zero is even = True, correct
+  (1, 4, NULL, '2x', true, 5, '2025-11-01 10:12:00+00'); -- Q4: Derivative of x^2, got partial credit (5/8)
+
+-- Attempt 2 (User 1, Programming Fundamentals, In Progress) - topic_question ids: 9,10,11,12,13
+INSERT INTO user_answer (attempt_id, topic_question_id, answer_id, user_answer_text, is_correct, points_awarded, answered_at) VALUES
+  (2, 9, 25, NULL, true, 5, '2025-11-05 14:35:00+00'),   -- Q9: JavaScript, correct
+  (2, 10, 26, NULL, true, 10, '2025-11-05 14:40:00+00'), -- Q10: Java (statically typed), correct
+  (2, 11, 33, NULL, false, 0, '2025-11-05 14:45:00+00'); -- Q11: Git merge = False, incorrect (should be True)
+
+-- Attempt 3 (User 2, World Geography, Completed) - topic_question ids: 5,6,7,8
+INSERT INTO user_answer (attempt_id, topic_question_id, answer_id, user_answer_text, is_correct, points_awarded, answered_at) VALUES
+  (3, 5, 12, NULL, true, 5, '2025-11-03 09:02:00+00'),    -- Q5: Paris, correct
+  (3, 6, 14, NULL, true, 10, '2025-11-03 09:06:00+00'),   -- Q6: Brazil (South America), correct
+  (3, 7, 19, NULL, true, 3, '2025-11-03 09:10:00+00'),    -- Q7: Equator passes Brazil = True, correct
+  (3, 8, NULL, 'Pacific', true, 8, '2025-11-03 09:15:00+00'); -- Q8: Pacific Ocean, correct
+
+-- Attempt 4 (User 2, Basic Math, Completed) - topic_question ids: 1,2,3,4
+INSERT INTO user_answer (attempt_id, topic_question_id, answer_id, user_answer_text, is_correct, points_awarded, answered_at) VALUES
+  (4, 1, 1, NULL, true, 5, '2025-11-06 11:02:00+00'),    -- Q1: 2+2=4, correct
+  (4, 2, 5, NULL, false, 0, '2025-11-06 11:04:00+00'),   -- Q2: Selected 3 only, incorrect (missing 2 and 5)
+  (4, 3, 8, NULL, true, 3, '2025-11-06 11:06:00+00'),    -- Q3: Zero is even = True, correct
+  (4, 4, NULL, '2', false, 0, '2025-11-06 11:10:00+00'); -- Q4: Wrong answer (should be 2x), incorrect
+
 COMMIT;

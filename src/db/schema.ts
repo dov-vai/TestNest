@@ -84,10 +84,57 @@ export const topicQuestions = pgTable(
   (tq) => [uniqueIndex('uq_topic_question').on(tq.topicId, tq.questionId)]
 );
 
+export const userTopicAttempts = pgTable(
+  'user_topic_attempt',
+  {
+    id: serial('id').primaryKey(),
+    userId: integer('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    topicId: integer('topic_id')
+      .notNull()
+      .references(() => topics.id, { onDelete: 'cascade' }),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+    submittedAt: timestamp('submitted_at', { withTimezone: true }),
+    totalPoints: integer('total_points').notNull().default(0),
+    earnedPoints: integer('earned_points').notNull().default(0),
+    isCompleted: boolean('is_completed').notNull().default(false),
+  },
+  (uta) => [
+    index('idx_uta_user_id').on(uta.userId),
+    index('idx_uta_topic_id').on(uta.topicId),
+    index('idx_uta_user_topic').on(uta.userId, uta.topicId),
+  ]
+);
+
+export const userAnswers = pgTable(
+  'user_answer',
+  {
+    id: serial('id').primaryKey(),
+    attemptId: integer('attempt_id')
+      .notNull()
+      .references(() => userTopicAttempts.id, { onDelete: 'cascade' }),
+    topicQuestionId: integer('topic_question_id')
+      .notNull()
+      .references(() => topicQuestions.id, { onDelete: 'cascade' }),
+    answerId: integer('answer_id').references(() => answers.id, { onDelete: 'set null' }),
+    userAnswerText: text('user_answer_text'),
+    isCorrect: boolean('is_correct').notNull().default(false),
+    pointsAwarded: integer('points_awarded').notNull().default(0),
+    answeredAt: timestamp('answered_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (ua) => [
+    uniqueIndex('uq_attempt_topic_question').on(ua.attemptId, ua.topicQuestionId),
+    index('idx_ua_attempt_id').on(ua.attemptId),
+    index('idx_ua_topic_question_id').on(ua.topicQuestionId),
+  ]
+);
+
 export const usersRelations = relations(users, ({ many }) => ({
   topics: many(topics),
   refreshTokens: many(refreshTokens),
   questions: many(questions),
+  topicAttempts: many(userTopicAttempts),
 }));
 
 export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
@@ -99,6 +146,7 @@ export const refreshTokensRelations = relations(refreshTokens, ({ one }) => ({
 
 export const topicsRelations = relations(topics, ({ many, one }) => ({
   topicQuestions: many(topicQuestions),
+  topicAttempts: many(userTopicAttempts),
   user: one(users, {
     fields: [topics.userId],
     references: [users.id],
@@ -114,9 +162,51 @@ export const questionsRelations = relations(questions, ({ many, one }) => ({
   }),
 }));
 
-export const answersRelations = relations(answers, ({}) => ({}));
+export const answersRelations = relations(answers, ({ one }) => ({
+  question: one(questions, {
+    fields: [answers.questionId],
+    references: [questions.id],
+  }),
+}));
 
-export const topicQuestionsRelations = relations(topicQuestions, ({}) => ({}));
+export const topicQuestionsRelations = relations(topicQuestions, ({ one, many }) => ({
+  topic: one(topics, {
+    fields: [topicQuestions.topicId],
+    references: [topics.id],
+  }),
+  question: one(questions, {
+    fields: [topicQuestions.questionId],
+    references: [questions.id],
+  }),
+  userAnswers: many(userAnswers),
+}));
+
+export const userTopicAttemptsRelations = relations(userTopicAttempts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [userTopicAttempts.userId],
+    references: [users.id],
+  }),
+  topic: one(topics, {
+    fields: [userTopicAttempts.topicId],
+    references: [topics.id],
+  }),
+  userAnswers: many(userAnswers),
+}));
+
+export const userAnswersRelations = relations(userAnswers, ({ one }) => ({
+  attempt: one(userTopicAttempts, {
+    fields: [userAnswers.attemptId],
+    references: [userTopicAttempts.id],
+  }),
+  topicQuestion: one(topicQuestions, {
+    fields: [userAnswers.topicQuestionId],
+    references: [topicQuestions.id],
+  }),
+  answer: one(answers, {
+    fields: [userAnswers.answerId],
+    references: [answers.id],
+  }),
+}));
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -130,3 +220,7 @@ export type Answer = typeof answers.$inferSelect;
 export type NewAnswer = typeof answers.$inferInsert;
 export type TopicQuestion = typeof topicQuestions.$inferSelect;
 export type NewTopicQuestion = typeof topicQuestions.$inferInsert;
+export type UserTopicAttempt = typeof userTopicAttempts.$inferSelect;
+export type NewUserTopicAttempt = typeof userTopicAttempts.$inferInsert;
+export type UserAnswer = typeof userAnswers.$inferSelect;
+export type NewUserAnswer = typeof userAnswers.$inferInsert;

@@ -119,6 +119,160 @@
           "orderIdx"
         ]
       },
+      "answerSubmitSchema": {
+        "type": "object",
+        "properties": {
+          "topicQuestionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic question link ID"
+          },
+          "answerId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true,
+            "description": "Selected answer ID (for multiple choice)"
+          },
+          "userAnswerText": {
+            "type": "string",
+            "maxLength": 1000,
+            "nullable": true,
+            "description": "Text answer (for fill in the blank)"
+          }
+        },
+        "required": [
+          "topicQuestionId"
+        ]
+      },
+      "userAnswerSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "attemptId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "topicQuestionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "answerId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "nullable": true
+          },
+          "userAnswerText": {
+            "type": "string",
+            "nullable": true
+          },
+          "isCorrect": {
+            "type": "boolean"
+          },
+          "pointsAwarded": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "answeredAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "attemptId",
+          "topicQuestionId",
+          "isCorrect",
+          "pointsAwarded",
+          "answeredAt"
+        ]
+      },
+      "attemptSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "userId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true
+          },
+          "startedAt": {
+            "type": "object"
+          },
+          "submittedAt": {
+            "type": "object",
+            "nullable": true
+          },
+          "totalPoints": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "earnedPoints": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "isCompleted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "topicId",
+          "startedAt",
+          "totalPoints",
+          "earnedPoints",
+          "isCompleted"
+        ]
+      },
+      "attemptCompleteSchema": {
+        "type": "object",
+        "properties": {
+          "isCompleted": {
+            "type": "boolean",
+            "description": "Mark attempt as completed"
+          }
+        },
+        "required": [
+          "isCompleted"
+        ]
+      },
+      "attemptListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/attemptSchema"
+        }
+      },
+      "attemptCreateSchema": {
+        "type": "object",
+        "properties": {
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic ID"
+          }
+        },
+        "required": [
+          "topicId"
+        ]
+      },
       "questionSchema": {
         "type": "object",
         "properties": {
@@ -141,12 +295,31 @@
               "fill_blank"
             ],
             "description": "Question type"
+          },
+          "userId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "User id who created the question"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Creation timestamp"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Last update timestamp"
           }
         },
         "required": [
           "id",
           "text",
-          "type"
+          "type",
+          "userId",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "questionUpdateSchema": {
@@ -481,61 +654,6 @@
           "$ref": "#/components/schemas/userSchema"
         }
       },
-      "topicQuestionListSchema": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/topicQuestionSchema"
-        }
-      },
-      "topicQuestionWithQuestionSchema": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Link id"
-          },
-          "topicId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Topic id"
-          },
-          "questionId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
-            "description": "Question id"
-          },
-          "orderIdx": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "Order index (>=0)"
-          },
-          "points": {
-            "type": "integer",
-            "minimum": 0,
-            "description": "Points (>=0)"
-          },
-          "question": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/questionSchema"
-              }
-            ],
-            "description": "Embedded question"
-          }
-        },
-        "required": [
-          "id",
-          "topicId",
-          "questionId",
-          "orderIdx",
-          "points",
-          "question"
-        ]
-      },
       "loginSchema": {
         "type": "object",
         "properties": {
@@ -626,6 +744,61 @@
         },
         "required": [
           "id"
+        ]
+      },
+      "topicQuestionListSchema": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/topicQuestionSchema"
+        }
+      },
+      "topicQuestionWithQuestionSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Link id"
+          },
+          "topicId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Topic id"
+          },
+          "questionId": {
+            "type": "integer",
+            "minimum": 0,
+            "exclusiveMinimum": true,
+            "description": "Question id"
+          },
+          "orderIdx": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Order index (>=0)"
+          },
+          "points": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Points (>=0)"
+          },
+          "question": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/questionSchema"
+              }
+            ],
+            "description": "Embedded question"
+          }
+        },
+        "required": [
+          "id",
+          "topicId",
+          "questionId",
+          "orderIdx",
+          "points",
+          "question"
         ]
       },
       "UserSchema": {
@@ -1206,6 +1379,273 @@
         }
       }
     },
+    "/attempts": {
+      "get": {
+        "operationId": "get-attempts",
+        "summary": "List user's attempts",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/attemptListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "post": {
+        "operationId": "post-attempts",
+        "summary": "Start a new attempt (begin a test)",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/attemptCreateSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/attemptSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/attempts/{id}": {
+      "get": {
+        "operationId": "get-attempts-{id}",
+        "summary": "Get attempt by ID with all answers",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/attemptSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "patch": {
+        "operationId": "patch-attempts-{id}",
+        "summary": "Complete/submit an attempt",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/attemptCompleteSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/attemptSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      },
+      "delete": {
+        "operationId": "delete-attempts-{id}",
+        "summary": "Delete an attempt",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Empty"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/attempts/{id}/answers": {
+      "post": {
+        "operationId": "post-attempts-{id}-answers",
+        "summary": "Submit an answer for a question in an attempt",
+        "description": "",
+        "tags": [
+          "Attempts"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/answerSubmitSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userAnswerSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "post-auth-login",
@@ -1756,6 +2196,47 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/answerListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/topics/{id}/attempts": {
+      "get": {
+        "operationId": "get-topics-{id}-attempts",
+        "summary": "List user's attempts for a specific topic",
+        "description": "",
+        "tags": [
+          "Topics"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/attemptListSchema"
                 }
               }
             }

@@ -73,6 +73,34 @@ CREATE TABLE IF NOT EXISTS topic_question (
 CREATE INDEX IF NOT EXISTS idx_tq_topic_id ON topic_question(topic_id);
 CREATE INDEX IF NOT EXISTS idx_tq_question_id ON topic_question(question_id);
 
+CREATE TABLE IF NOT EXISTS user_topic_attempt (
+  id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  topic_id INTEGER NOT NULL REFERENCES topic(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  submitted_at TIMESTAMPTZ,
+  total_points INTEGER NOT NULL DEFAULT 0,
+  earned_points INTEGER NOT NULL DEFAULT 0,
+  is_completed BOOLEAN NOT NULL DEFAULT false
+);
+CREATE INDEX IF NOT EXISTS idx_uta_user_id ON user_topic_attempt(user_id);
+CREATE INDEX IF NOT EXISTS idx_uta_topic_id ON user_topic_attempt(topic_id);
+CREATE INDEX IF NOT EXISTS idx_uta_user_topic ON user_topic_attempt(user_id, topic_id);
+
+CREATE TABLE IF NOT EXISTS user_answer (
+  id SERIAL PRIMARY KEY,
+  attempt_id INTEGER NOT NULL REFERENCES user_topic_attempt(id) ON DELETE CASCADE,
+  topic_question_id INTEGER NOT NULL REFERENCES topic_question(id) ON DELETE CASCADE,
+  answer_id INTEGER REFERENCES answer(id) ON DELETE SET NULL,
+  user_answer_text TEXT,
+  is_correct BOOLEAN NOT NULL DEFAULT false,
+  points_awarded INTEGER NOT NULL DEFAULT 0,
+  answered_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT uq_attempt_topic_question UNIQUE (attempt_id, topic_question_id)
+);
+CREATE INDEX IF NOT EXISTS idx_ua_attempt_id ON user_answer(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_ua_topic_question_id ON user_answer(topic_question_id);
+
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$
 BEGIN

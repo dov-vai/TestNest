@@ -1,13 +1,15 @@
 import { NextRequest } from 'next/server';
-import { z } from 'zod';
 import { json, handleError } from '../../_lib/http';
 import { verifyRefreshToken, generateAccessToken, generateRefreshToken, getRefreshTokenExpiry } from '@/lib/auth';
 import { findRefreshTokenById, revokeRefreshToken, createRefreshToken, findUserById } from '@/db/queries/users';
+import { refreshSchema } from '../../_lib/schemas/auth';
 
-const refreshSchema = z.object({
-  refreshToken: z.string(),
-});
-
+/**
+ * Refresh access token
+ * @body refreshSchema
+ * @response 200:tokenResponseSchema
+ * @openapi
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

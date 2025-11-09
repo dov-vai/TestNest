@@ -273,6 +273,131 @@
           "topicId"
         ]
       },
+      "loginSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "authResponseSchema": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "user",
+          "user",
+          "accessToken",
+          "refreshToken"
+        ]
+      },
+      "meResponseSchema": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "email": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "nullable": true
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "user",
+                  "admin"
+                ]
+              },
+              "isActive": {
+                "type": "boolean"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            "required": [
+              "id",
+              "email",
+              "role",
+              "isActive",
+              "createdAt"
+            ]
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
+      "refreshSchema": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "tokenResponseSchema": {
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ]
+      },
+      "registerSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          },
+          "name": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
       "questionSchema": {
         "type": "object",
         "properties": {
@@ -570,7 +695,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer"
+            "type": "number"
           },
           "email": {
             "type": "string"
@@ -590,26 +715,8 @@
             "type": "boolean"
           },
           "createdAt": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "string",
-                "format": "date-time"
-              }
-            ]
-          },
-          "updatedAt": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "string",
-                "format": "date-time"
-              }
-            ]
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
@@ -617,8 +724,7 @@
           "email",
           "role",
           "isActive",
-          "createdAt",
-          "updatedAt"
+          "createdAt"
         ]
       },
       "adminUserUpdateSchema": {
@@ -653,52 +759,6 @@
         "items": {
           "$ref": "#/components/schemas/userSchema"
         }
-      },
-      "loginSchema": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
-      "refreshSchema": {
-        "type": "object",
-        "properties": {
-          "refreshToken": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "refreshToken"
-        ]
-      },
-      "registerSchema": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 8
-          },
-          "name": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
       },
       "idParamSchema": {
         "type": "object",
@@ -805,7 +865,7 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "integer"
+            "type": "number"
           },
           "email": {
             "type": "string"
@@ -825,26 +885,8 @@
             "type": "boolean"
           },
           "createdAt": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "string",
-                "format": "date-time"
-              }
-            ]
-          },
-          "updatedAt": {
-            "oneOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "string",
-                "format": "date-time"
-              }
-            ]
+            "type": "string",
+            "format": "date-time"
           }
         },
         "required": [
@@ -852,8 +894,7 @@
           "email",
           "role",
           "isActive",
-          "createdAt",
-          "updatedAt"
+          "createdAt"
         ]
       },
       "AdminUserUpdateSchema": {
@@ -1649,13 +1690,73 @@
     "/auth/login": {
       "post": {
         "operationId": "post-auth-login",
-        "summary": "",
+        "summary": "Login",
+        "description": "",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/loginSchema"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/authResponseSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "operationId": "get-auth-me",
+        "summary": "Get current authenticated user",
         "description": "",
         "tags": [
           "Auth"
         ],
         "parameters": [],
         "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/meResponseSchema"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/400"
           },
@@ -1680,13 +1781,32 @@
     "/auth/refresh": {
       "post": {
         "operationId": "post-auth-refresh",
-        "summary": "",
+        "summary": "Refresh access token",
         "description": "",
         "tags": [
           "Auth"
         ],
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/refreshSchema"
+              }
+            }
+          }
+        },
         "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/tokenResponseSchema"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/400"
           },
@@ -1711,13 +1831,32 @@
     "/auth/register": {
       "post": {
         "operationId": "post-auth-register",
-        "summary": "",
+        "summary": "Register a new user",
         "description": "",
         "tags": [
           "Auth"
         ],
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/registerSchema"
+              }
+            }
+          }
+        },
         "responses": {
+          "201": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/authResponseSchema"
+                }
+              }
+            }
+          },
           "400": {
             "$ref": "#/components/responses/400"
           },

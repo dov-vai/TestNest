@@ -1,14 +1,15 @@
 import { NextRequest } from 'next/server';
-import { z } from 'zod';
 import { json, handleError } from '../../_lib/http';
 import { verifyPassword, generateAccessToken, generateRefreshToken, getRefreshTokenExpiry } from '@/lib/auth';
 import { findUserByEmail, createRefreshToken } from '@/db/queries/users';
+import { loginSchema } from '../../_lib/schemas/auth';
 
-const loginSchema = z.object({
-  email: z.email(),
-  password: z.string(),
-});
-
+/**
+ * Login
+ * @body loginSchema
+ * @response 200:authResponseSchema
+ * @openapi
+ */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

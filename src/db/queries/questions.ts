@@ -12,8 +12,8 @@ export async function listQuestions(db: DB, { limit, offset }: Pagination, userI
       : eq(questions.isPrivate, false);
 
   const query = db.select().from(questions);
-  
-  return whereClause 
+
+  return whereClause
     ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(questions.id))
     : query.limit(limit).offset(offset).orderBy(asc(questions.id));
 }

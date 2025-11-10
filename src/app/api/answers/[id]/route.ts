@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { db } from '@/db/client';
-import { getAnswerById, getAnswerWithQuestion, updateAnswer, deleteAnswer } from '@/db/queries/answers';
+import { getAnswerWithQuestion, updateAnswer, deleteAnswer } from '@/db/queries/answers';
 import { json, badRequest, notFound, handleError, unauthorized, forbidden } from '../../_lib/http';
 import { idParamSchema } from '../../_lib/schemas/common';
 import { answerUpdateSchema } from '../../_lib/schemas/answer';
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
   try {
     const user = await authenticate(req);
     const { id } = idParamSchema.parse(await context.params);
-    
+
     // Need to get answer with its question to check privacy
     const result = await getAnswerWithQuestion(db, id);
     if (!result) return notFound('Answer not found');

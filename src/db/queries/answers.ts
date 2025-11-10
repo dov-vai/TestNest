@@ -22,7 +22,7 @@ export async function listAnswers(db: DB, { limit, offset }: Pagination, userId?
     .from(answers)
     .innerJoin(questions, eq(answers.questionId, questions.id));
 
-  return whereClause 
+  return whereClause
     ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(answers.id))
     : query.limit(limit).offset(offset).orderBy(asc(answers.id));
 }

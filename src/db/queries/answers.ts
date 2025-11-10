@@ -1,11 +1,30 @@
 import { DB } from '@/db/client';
 import { Answer, answers, topicQuestions, questions } from '@/db/schema';
-import { eq, asc, inArray } from 'drizzle-orm';
+import { eq, asc, inArray, or, and } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
-export async function listAnswers(db: DB, { limit, offset }: Pagination) {
-  return db.select().from(answers).limit(limit).offset(offset).orderBy(asc(answers.id));
+export async function listAnswers(db: DB, { limit, offset }: Pagination, userId?: number, isAdmin?: boolean) {
+  const whereClause = isAdmin
+    ? undefined // No filter for admins - show all answers
+    : userId
+      ? or(eq(questions.isPrivate, false), and(eq(questions.userId, userId), eq(questions.isPrivate, true)))
+      : eq(questions.isPrivate, false);
+
+  const query = db
+    .select({
+      id: answers.id,
+      questionId: answers.questionId,
+      text: answers.text,
+      isCorrect: answers.isCorrect,
+      orderIdx: answers.orderIdx,
+    })
+    .from(answers)
+    .innerJoin(questions, eq(answers.questionId, questions.id));
+
+  return whereClause 
+    ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(answers.id))
+    : query.limit(limit).offset(offset).orderBy(asc(answers.id));
 }
 
 export async function createAnswer(

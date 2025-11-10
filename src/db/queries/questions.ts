@@ -1,11 +1,21 @@
 import { DB } from '@/db/client';
 import { Question, questions, topicQuestions } from '@/db/schema';
-import { eq, asc, inArray } from 'drizzle-orm';
+import { eq, asc, inArray, or, and } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
-export async function listQuestions(db: DB, { limit, offset }: Pagination) {
-  return db.select().from(questions).limit(limit).offset(offset).orderBy(asc(questions.id));
+export async function listQuestions(db: DB, { limit, offset }: Pagination, userId?: number, isAdmin?: boolean) {
+  const whereClause = isAdmin
+    ? undefined // No filter for admins - show all questions
+    : userId
+      ? or(eq(questions.isPrivate, false), and(eq(questions.userId, userId), eq(questions.isPrivate, true)))
+      : eq(questions.isPrivate, false);
+
+  const query = db.select().from(questions);
+  
+  return whereClause 
+    ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(questions.id))
+    : query.limit(limit).offset(offset).orderBy(asc(questions.id));
 }
 
 export async function createQuestion(
@@ -14,6 +24,7 @@ export async function createQuestion(
     text: string;
     type: 'multi' | 'single' | 'true_false' | 'fill_blank';
     userId: number;
+    isPrivate?: boolean;
   }
 ) {
   const [created] = await db.insert(questions).values(data).returning();
@@ -31,6 +42,7 @@ export async function updateQuestion(
   data: {
     text?: string;
     type?: 'multi' | 'single' | 'true_false' | 'fill_blank';
+    isPrivate?: boolean;
   }
 ) {
   const [updated] = await db.update(questions).set(data).where(eq(questions.id, id)).returning();

@@ -15,19 +15,19 @@ INSERT INTO topic (title, description, user_id, is_private) VALUES
   ('Programming Fundamentals', 'Core CS and languages', 3, false);
 
 -- Questions
-INSERT INTO question (text, type, user_id) VALUES
-  ('What is 2 + 2?', 'single', 1),                                   -- id 1
-  ('Select all prime numbers.', 'multi', 1),                          -- id 2
-  ('Zero is an even number.', 'true_false', 1),                       -- id 3
-  ('The derivative of x^2 is __.', 'fill_blank', 1),                  -- id 4
-  ('What is the capital of France?', 'single', 2),                    -- id 5
-  ('Select all countries in South America.', 'multi', 2),             -- id 6
-  ('The equator passes through Brazil.', 'true_false', 2),            -- id 7
-  ('The largest ocean on Earth is the __ Ocean.', 'fill_blank', 2),  -- id 8
-  ('Which language runs in a web browser?', 'single', 3),             -- id 9
-  ('Which of the following are statically typed languages?', 'multi', 3), -- id 10
-  ('In Git, "merge" combines the histories of branches.', 'true_false', 3), -- id 11
-  ('The time complexity of binary search is O(__).', 'fill_blank', 3);     -- id 12
+INSERT INTO question (text, type, user_id, is_private) VALUES
+  ('What is 2 + 2?', 'single', 1, false),                                   -- id 1
+  ('Select all prime numbers.', 'multi', 1, false),                          -- id 2
+  ('Zero is an even number.', 'true_false', 1, false),                       -- id 3
+  ('The derivative of x^2 is __.', 'fill_blank', 1, false),                  -- id 4
+  ('What is the capital of France?', 'single', 2, true),                    -- id 5 (private - belongs to private topic)
+  ('Select all countries in South America.', 'multi', 2, true),             -- id 6 (private)
+  ('The equator passes through Brazil.', 'true_false', 2, true),            -- id 7 (private)
+  ('The largest ocean on Earth is the __ Ocean.', 'fill_blank', 2, true),  -- id 8 (private)
+  ('Which language runs in a web browser?', 'single', 3, false),             -- id 9
+  ('Which of the following are statically typed languages?', 'multi', 3, false), -- id 10
+  ('In Git, "merge" combines the histories of branches.', 'true_false', 3, false), -- id 11
+  ('The time complexity of binary search is O(__).', 'fill_blank', 3, false);     -- id 12
 
 -- Answers
 -- Q1

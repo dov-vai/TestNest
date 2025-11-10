@@ -4,19 +4,28 @@ import { getAnswerById, getAnswerWithQuestion, updateAnswer, deleteAnswer } from
 import { json, badRequest, notFound, handleError, unauthorized, forbidden } from '../../_lib/http';
 import { idParamSchema } from '../../_lib/schemas/common';
 import { answerUpdateSchema } from '../../_lib/schemas/answer';
-import { requireAuth, isAdmin } from '../../_lib/middleware';
+import { authenticate, requireAuth, isAdmin } from '../../_lib/middleware';
 
 /**
  * Get answer by id
  * @response 200:answerSchema
  * @openapi
  */
-export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const user = await authenticate(req);
     const { id } = idParamSchema.parse(await context.params);
-    const row = await getAnswerById(db, id);
-    if (!row) return notFound('Answer not found');
-    return json(row);
+    
+    // Need to get answer with its question to check privacy
+    const result = await getAnswerWithQuestion(db, id);
+    if (!result) return notFound('Answer not found');
+
+    // Check if user has access to the question (and thus its answer)
+    if (result.question.isPrivate && (!user || (user.userId !== result.question.userId && !isAdmin(user)))) {
+      return forbidden('You do not have access to this answer');
+    }
+
+    return json(result.answer);
   } catch (e) {
     return badRequest(e);
   }

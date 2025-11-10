@@ -4,18 +4,25 @@ import { getQuestionById, updateQuestion, deleteQuestion } from '@/db/queries/qu
 import { json, badRequest, notFound, handleError, unauthorized, forbidden } from '../../_lib/http';
 import { idParamSchema } from '../../_lib/schemas/common';
 import { questionUpdateSchema } from '../../_lib/schemas/question';
-import { requireAuth, isAdmin } from '../../_lib/middleware';
+import { authenticate, requireAuth, isAdmin } from '../../_lib/middleware';
 
 /**
  * Get question by id
  * @response 200:questionSchema
  * @openapi
  */
-export async function GET(_req: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
+    const user = await authenticate(req);
     const { id } = idParamSchema.parse(await context.params);
     const row = await getQuestionById(db, id);
     if (!row) return notFound('Question not found');
+
+    // Check if user has access to private question
+    if (row.isPrivate && (!user || (user.userId !== row.userId && !isAdmin(user)))) {
+      return forbidden('You do not have access to this private question');
+    }
+
     return json(row);
   } catch (e) {
     return badRequest(e);

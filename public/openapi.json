@@ -427,6 +427,10 @@
             "exclusiveMinimum": true,
             "description": "User id who created the question"
           },
+          "isPrivate": {
+            "type": "boolean",
+            "description": "Whether the question is private"
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -443,6 +447,7 @@
           "text",
           "type",
           "userId",
+          "isPrivate",
           "createdAt",
           "updatedAt"
         ]
@@ -466,6 +471,11 @@
             ],
             "nullable": true,
             "description": "Updated type"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Updated privacy setting"
           }
         }
       },
@@ -492,6 +502,11 @@
               "fill_blank"
             ],
             "description": "Question type"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Whether the question is private"
           }
         },
         "required": [

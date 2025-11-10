@@ -4,7 +4,7 @@ import { json, badRequest, serverError, unauthorized } from '../_lib/http';
 import { paginationSchema } from '../_lib/schemas/common';
 import { questionCreateSchema } from '../_lib/schemas/question';
 import { listQuestions, createQuestion } from '@/db/queries/questions';
-import { requireAuth } from '../_lib/middleware';
+import { authenticate, requireAuth, isAdmin } from '../_lib/middleware';
 
 /**
  * List questions
@@ -13,6 +13,8 @@ import { requireAuth } from '../_lib/middleware';
  */
 export async function GET(req: NextRequest) {
   try {
+    const user = await authenticate(req);
+
     const { searchParams } = new URL(req.url);
     const parsed = paginationSchema.safeParse({
       limit: searchParams.get('limit'),
@@ -21,7 +23,7 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
 
-    const data = await listQuestions(db, { limit, offset });
+    const data = await listQuestions(db, { limit, offset }, user?.userId, isAdmin(user));
     return json(data);
   } catch (e) {
     return serverError(e);

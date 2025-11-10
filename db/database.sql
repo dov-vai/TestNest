@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS question (
   text TEXT NOT NULL,
   type question_type NOT NULL,
   user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  is_private BOOLEAN NOT NULL DEFAULT false,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );

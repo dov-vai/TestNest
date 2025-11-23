@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, context: { params: Promise<{ id: s
     if (!attempt) return notFound('Attempt not found');
 
     // Users can only update their own attempts
-    if (attempt.userId !== user.userId) {
+    if (attempt.userId !== user.userId && !isAdmin(user)) {
       return forbidden('You do not have access to this attempt');
     }
 
@@ -98,7 +98,7 @@ export async function DELETE(req: NextRequest, context: { params: Promise<{ id: 
     if (!attempt) return notFound('Attempt not found');
 
     // Users can only delete their own attempts
-    if (attempt.userId !== user.userId) {
+    if (attempt.userId !== user.userId && !isAdmin(user)) {
       return forbidden('You do not have access to this attempt');
     }
 

@@ -3,7 +3,7 @@ import { db } from '@/db/client';
 import { getAttemptById, submitAnswer, checkAnswer } from '@/db/queries/attempts';
 import { json, badRequest, notFound, unauthorized, forbidden } from '@/app/api/_lib/http';
 import { answerSubmitSchema } from '@/app/api/_lib/schemas/attempt';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { isAdmin, requireAuth } from '@/app/api/_lib/middleware';
 import { idParamSchema } from '@/app/api/_lib/schemas/common';
 
 /**
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     if (!attempt) return notFound('Attempt not found');
 
     // Users can only submit answers to their own attempts
-    if (attempt.userId !== user.userId) {
+    if (attempt.userId !== user.userId && !isAdmin(user)) {
       return forbidden('You do not have access to this attempt');
     }
 

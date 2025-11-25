@@ -42,6 +42,8 @@ export const MyTopicsTab: React.FC = () => {
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [topicForm, setTopicForm] = useState({ title: '', description: '', isPrivate: false });
   const [formLoading, setFormLoading] = useState(false);
+  const [confirmTopicId, setConfirmTopicId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const handleCreateOrUpdateTopic = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,13 +71,16 @@ export const MyTopicsTab: React.FC = () => {
   };
 
   const handleDeleteTopic = async (id: number) => {
-    if (!confirm('Are you sure? This will delete all questions and attempts associated with this topic.')) return;
+    setDeleting(true);
     try {
       const res = await fetchWithAuth(`/api/topics/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
       mutate();
+      setConfirmTopicId(null);
     } catch (err) {
       alert('Error deleting topic');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -135,7 +140,7 @@ export const MyTopicsTab: React.FC = () => {
                   <Edit2 className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={(e) => { e.preventDefault(); handleDeleteTopic(topic.id); }}
+                  onClick={(e) => { e.preventDefault(); setConfirmTopicId(topic.id); }}
                   className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-red-600"
                   title="Delete"
                 >
@@ -193,6 +198,25 @@ export const MyTopicsTab: React.FC = () => {
             </Button>
           </div>
         </form>
+      </Modal>
+      <Modal
+        isOpen={confirmTopicId !== null}
+        onClose={() => { if (!deleting) setConfirmTopicId(null); }}
+        title="Delete Topic"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setConfirmTopicId(null)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={() => confirmTopicId !== null && handleDeleteTopic(confirmTopicId)} isLoading={deleting} className="w-full sm:w-auto">
+              Yes, Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-500">
+          Are you sure you want to delete this topic? This will delete all questions and attempts associated with it.
+        </p>
       </Modal>
     </div>
   );

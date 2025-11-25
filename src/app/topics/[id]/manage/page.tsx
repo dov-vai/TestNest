@@ -38,6 +38,8 @@ export default function ManageTopicPage() {
   const [availableQuestions, setAvailableQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [questionToUnlink, setQuestionToUnlink] = useState<number | null>(null);
   
   // Create Question Form
   const [createMode, setCreateMode] = useState(false);
@@ -72,15 +74,23 @@ export default function ManageTopicPage() {
       if (accessToken) fetchData();
   }, [accessToken, id]);
 
-  const handleUnlink = async (linkId: number) => {
-      if (!confirm('Remove this question from topic?')) return;
+  const openDeleteModal = (linkId: number) => {
+      setQuestionToUnlink(linkId);
+      setIsDeleteModalOpen(true);
+  };
+
+  const confirmUnlink = async () => {
+      if (!questionToUnlink) return;
+      setIsDeleteModalOpen(false);
       try {
-          await fetchWithAuth(`/api/topics/${id}/questions/${linkId}`, {
+          await fetchWithAuth(`/api/topics/${id}/questions/${questionToUnlink}`, {
               method: 'DELETE',
           });
-          setTopicQuestions(prev => prev.filter(tq => tq.id !== linkId));
+          setTopicQuestions(prev => prev.filter(tq => tq.id !== questionToUnlink));
       } catch (e) {
           alert('Failed to unlink');
+      } finally {
+          setQuestionToUnlink(null);
       }
   };
 
@@ -153,7 +163,7 @@ export default function ManageTopicPage() {
                             </div>
                             <div className="ml-4 flex-shrink-0">
                                 <button 
-                                    onClick={() => handleUnlink(tq.id)}
+                                    onClick={() => openDeleteModal(tq.id)}
                                     className="text-red-600 hover:text-red-900"
                                 >
                                     <Trash2 className="h-5 w-5" />
@@ -221,6 +231,26 @@ export default function ManageTopicPage() {
                      </p>
                 </div>
             </div>
+        </Modal>
+
+        <Modal
+            isOpen={isDeleteModalOpen}
+            onClose={() => setIsDeleteModalOpen(false)}
+            title="Remove Question"
+            footer={
+              <>
+                <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="w-full sm:w-auto">
+                  Cancel
+                </Button>
+                <Button onClick={confirmUnlink} className="w-full sm:w-auto">
+                  Remove
+                </Button>
+              </>
+            }
+        >
+            <p className="text-sm text-gray-500">
+              Are you sure you want to remove this question from the topic?
+            </p>
         </Modal>
     </div>
   );

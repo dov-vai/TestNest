@@ -35,6 +35,8 @@ export const MyQuestionsTab = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [qForm, setQForm] = useState({ text: '', type: 'single', isPrivate: false });
   const [answerText, setAnswerText] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [questionToDelete, setQuestionToDelete] = useState<number | null>(null);
 
   const handleCreateQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,13 +75,21 @@ export const MyQuestionsTab = () => {
     }
   };
 
-  const handleDeleteQuestion = async (id: number) => {
-    if (!confirm('Delete this question?')) return;
+  const openDeleteModal = (id: number) => {
+    setQuestionToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteQuestion = async () => {
+    if (!questionToDelete) return;
+    setIsDeleteModalOpen(false);
     try {
-      await fetchWithAuth(`/api/questions/${id}`, { method: 'DELETE' });
+      await fetchWithAuth(`/api/questions/${questionToDelete}`, { method: 'DELETE' });
       mutate();
     } catch (e) {
       alert('Failed to delete');
+    } finally {
+      setQuestionToDelete(null);
     }
   };
 
@@ -105,7 +115,7 @@ export const MyQuestionsTab = () => {
                   <p className="text-sm font-medium text-indigo-600">{q.text}</p>
                   <p className="text-xs text-gray-500">Type: {q.type}</p>
                 </div>
-                <button onClick={() => handleDeleteQuestion(q.id)} className="text-red-600 hover:text-red-800">
+                <button onClick={() => openDeleteModal(q.id)} className="text-red-600 hover:text-red-800">
                   <Trash2 className="h-5 w-5" />
                 </button>
               </li>
@@ -153,6 +163,26 @@ export const MyQuestionsTab = () => {
              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)} className="mt-3 w-full sm:mt-0 sm:w-auto">Cancel</Button>
            </div>
         </form>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Question"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={confirmDeleteQuestion} className="w-full sm:w-auto">
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-500">
+          Are you sure you want to delete this question? This action cannot be undone.
+        </p>
       </Modal>
     </div>
   );

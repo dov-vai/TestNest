@@ -26,6 +26,8 @@ export const UserManagement = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState<number | null>(null);
   
   const [editForm, setEditForm] = useState({
       name: '',
@@ -63,16 +65,24 @@ export const UserManagement = () => {
       setIsModalOpen(true);
   };
 
-  const handleDeleteUser = async (id: number) => {
-      if (!confirm('Are you sure you want to delete this user? This action cannot be undone.')) return;
+  const openDeleteModal = (id: number) => {
+      setUserToDelete(id);
+      setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteUser = async () => {
+      if (!userToDelete) return;
+      setIsDeleteModalOpen(false);
       try {
-          const res = await fetchWithAuth(`/api/users/${id}`, {
+          const res = await fetchWithAuth(`/api/users/${userToDelete}`, {
               method: 'DELETE',
           });
           if (!res.ok) throw new Error('Failed to delete user');
-          setUsers(prev => prev.filter(u => u.id !== id));
+          setUsers(prev => prev.filter(u => u.id !== userToDelete));
       } catch (e) {
           alert('Failed to delete user');
+      } finally {
+          setUserToDelete(null);
       }
   };
 
@@ -177,7 +187,7 @@ export const UserManagement = () => {
                     <Edit2 className="h-5 w-5" />
                   </button>
                   <button 
-                    onClick={() => handleDeleteUser(user.id)}
+                    onClick={() => openDeleteModal(user.id)}
                     className="text-red-600 hover:text-red-900"
                   >
                     <Trash2 className="h-5 w-5" />
@@ -241,6 +251,26 @@ export const UserManagement = () => {
                   </Button>
               </div>
           </form>
+      </Modal>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete User"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={confirmDeleteUser} className="w-full sm:w-auto">
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-500">
+          Are you sure you want to delete this user? This action cannot be undone.
+        </p>
       </Modal>
     </div>
   );

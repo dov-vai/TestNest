@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Loader } from '@/components/ui/Loader';
+import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/Button';
 import { Trash2, Eye, Lock, Unlock } from 'lucide-react';
 import Link from 'next/link';
 
@@ -25,6 +27,8 @@ export const AdminTopicManagement = () => {
   const fetchWithAuth = useAuthenticatedFetch();
   const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [topicToDelete, setTopicToDelete] = useState<number | null>(null);
 
   const fetchTopics = async () => {
     try {
@@ -44,16 +48,24 @@ export const AdminTopicManagement = () => {
     if (accessToken) fetchTopics();
   }, [accessToken]);
 
-  const handleDeleteTopic = async (id: number) => {
-      if (!confirm('Are you sure you want to delete this topic? This will remove all associated questions and attempts.')) return;
+  const openDeleteModal = (id: number) => {
+      setTopicToDelete(id);
+      setIsDeleteModalOpen(true);
+  };
+
+  const confirmDeleteTopic = async () => {
+      if (!topicToDelete) return;
+      setIsDeleteModalOpen(false);
       try {
-          const res = await fetchWithAuth(`/api/topics/${id}`, {
+          const res = await fetchWithAuth(`/api/topics/${topicToDelete}`, {
               method: 'DELETE',
           });
           if (!res.ok) throw new Error('Failed to delete topic');
-          setTopics(prev => prev.filter(t => t.id !== id));
+          setTopics(prev => prev.filter(t => t.id !== topicToDelete));
       } catch (e) {
           alert('Failed to delete topic');
+      } finally {
+          setTopicToDelete(null);
       }
   };
 
@@ -116,7 +128,7 @@ export const AdminTopicManagement = () => {
                         <Eye className="h-5 w-5" />
                     </Link>
                   <button 
-                    onClick={() => handleDeleteTopic(topic.id)}
+                    onClick={() => openDeleteModal(topic.id)}
                     className="text-red-600 hover:text-red-900"
                     title="Delete"
                   >
@@ -128,6 +140,26 @@ export const AdminTopicManagement = () => {
           </tbody>
         </table>
       </div>
+
+      <Modal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        title="Delete Topic"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={confirmDeleteTopic} className="w-full sm:w-auto">
+              Delete
+            </Button>
+          </>
+        }
+      >
+        <p className="text-sm text-gray-500">
+          Are you sure you want to delete this topic? This will remove all associated questions and attempts.
+        </p>
+      </Modal>
     </div>
   );
 };

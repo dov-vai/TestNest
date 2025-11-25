@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { Loader } from '@/components/ui/Loader';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { TextArea } from '../ui/TextArea';
 
 interface Topic {
   id: number;
@@ -160,8 +161,7 @@ export const MyTopicsTab: React.FC = () => {
           />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-            <textarea
-              className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
+            <TextArea
               rows={3}
               value={topicForm.description}
               onChange={(e) => setTopicForm({ ...topicForm, description: e.target.value })}

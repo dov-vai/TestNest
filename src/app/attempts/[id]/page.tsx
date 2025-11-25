@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Button } from '@/components/ui/Button';
 import { Loader } from '@/components/ui/Loader';
 import { Modal } from '@/components/ui/Modal';
-import { ArrowLeft, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface Question {
@@ -45,7 +45,6 @@ export default function AttemptPage() {
   const { id } = useParams();
   const { accessToken, user } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
-  const router = useRouter();
 
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -132,29 +131,28 @@ export default function AttemptPage() {
     });
   };
 
-  const submitAnswer = async (questionId: number) => {
-     const answer = answersMap[questionId];
-     if (!answer) return;
+  const submitAnswer = async (questionId: number, answerId: number | null = null, userAnswerText: string | null = null) => {
+    if (!answerId && !userAnswerText) return;
 
-     try {
-         const res = await fetchWithAuth(`/api/attempts/${id}/answers`, {
-             method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-             },
-             body: JSON.stringify({
-                 topicQuestionId: questionId,
-                 answerId: answer.answerId,
-                 userAnswerText: answer.userAnswerText,
-             }),
-         });
-         
-         if (!res.ok) {
-             console.error("Failed to save answer");
-         }
-     } catch (e) {
-         console.error(e);
-     }
+    try {
+        const res = await fetchWithAuth(`/api/attempts/${id}/answers`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                topicQuestionId: questionId,
+                answerId: answerId,
+                userAnswerText: userAnswerText,
+            }),
+        });
+        
+        if (!res.ok) {
+            console.error("Failed to save answer");
+        }
+    } catch (e) {
+        console.error(e);
+    }
   };
 
   const handleFinishClick = () => {
@@ -236,7 +234,7 @@ export default function AttemptPage() {
                             onChange={(e) => {
                                 handleAnswerChange(q.id, e.target.value);
                             }}
-                            onBlur={() => submitAnswer(q.id)}
+                            onBlur={(e) => submitAnswer(q.id, q.options[0].id, e.target.value)}
                             disabled={isReview}
                             placeholder="Type your answer..."
                         />
@@ -256,7 +254,7 @@ export default function AttemptPage() {
                                         handleAnswerChange(q.id, opt.id);
                                         // For radio, auto submit
                                         if (q.type !== 'multi') {
-                                            setTimeout(() => submitAnswer(q.id), 0);
+                                          submitAnswer(q.id, opt.id, null);
                                         }
                                     }}
                                     disabled={isReview}

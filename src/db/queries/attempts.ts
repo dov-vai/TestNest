@@ -115,6 +115,16 @@ export async function checkAnswer(
   // For multiple choice questions, check if the selected answer is correct
   if (answerId) {
     const [answer] = await db.select().from(answers).where(eq(answers.id, answerId));
+
+    // assume fill_blank question is there's userAnswerText or do another question fetch... probably not worth it.
+    if (userAnswerText) {
+      if (answer?.text.toLowerCase() === userAnswerText?.toLowerCase()) {
+        return { isCorrect: true, pointsAwarded: tq.points };
+      } else {
+        return { isCorrect: false, pointsAwarded: 0 };
+      }
+    }
+
     if (answer?.isCorrect) {
       return { isCorrect: true, pointsAwarded: tq.points };
     }

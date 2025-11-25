@@ -5,7 +5,7 @@ import { getTopicById } from '@/db/queries/topics';
 import { json, badRequest, notFound, unauthorized, forbidden } from '@/app/api/_lib/http';
 import { attemptCreateSchema } from '@/app/api/_lib/schemas/attempt';
 import { paginationSchema } from '@/app/api/_lib/schemas/common';
-import { requireAuth } from '@/app/api/_lib/middleware';
+import { isAdmin, requireAuth } from '@/app/api/_lib/middleware';
 import { eq, sum } from 'drizzle-orm';
 import { topicQuestions } from '@/db/schema';
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     if (!topic) return notFound('Topic not found');
 
     // Check if user can access this topic
-    if (topic.isPrivate && topic.userId !== user.userId) {
+    if (topic.isPrivate && topic.userId !== user.userId && !isAdmin(user)) {
       return forbidden('You do not have access to this private topic');
     }
 

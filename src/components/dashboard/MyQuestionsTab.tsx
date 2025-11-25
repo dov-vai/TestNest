@@ -1,9 +1,13 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import React, { useState } from 'react';
+import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Loader } from '@/components/ui/Loader';
 import { Plus, Trash2 } from 'lucide-react';
 
 interface Question {
@@ -15,76 +19,50 @@ interface Question {
 }
 
 export const MyQuestionsTab = () => {
-  const { accessToken, user } = useAuth();
+  const { user } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const fetcher = (url: string) => fetchWithAuth(url).then(res => res.json());
+
+  const { data, error, isLoading, mutate } = useSWR(
+    user ? '/api/questions' : null, 
+    fetcher
+  );
+
+  const questions: Question[] = data ? data.filter((q: Question) => q.userId === user?.id) : [];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
-  
-  // Simplified Question Form (Just text and type for now, adding answers would require nested form)
   const [qForm, setQForm] = useState({ text: '', type: 'single', isPrivate: false });
-  // To properly add answers, we'd need:
-  // 1. Create Question -> returns ID
-  // 2. Create Answers using ID
-  // For this demo, I'll just create the question shell. 
-  // Or I can add a simple "Correct Answer" and "Wrong Answers" input and handle multiple API calls.
   const [answerText, setAnswerText] = useState('');
-
-  const fetchQuestions = async () => {
-    try {
-      const res = await fetchWithAuth('/api/questions');
-      const data = await res.json();
-      // Filter for my questions (assuming API returns all public + my private, but we want only MINE)
-      // The API listQuestions returns all unless filtered?
-      // Let's assume we filter by userId on client for now.
-      if (user) {
-        setQuestions(data.filter((q: Question) => q.userId === user.id));
-      }
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (accessToken) fetchQuestions();
-  }, [accessToken]);
 
   const handleCreateQuestion = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormLoading(true);
     try {
-      // 1. Create Question
       const qRes = await fetchWithAuth('/api/questions', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(qForm),
       });
       
       if (!qRes.ok) throw new Error('Failed to create question');
       const newQ = await qRes.json();
 
-      // 2. Add Answer (Optional for demo, but good to have at least one)
       if (answerText) {
          await fetchWithAuth('/api/answers', {
              method: 'POST',
-             headers: {
-                 'Content-Type': 'application/json',
-             },
+             headers: { 'Content-Type': 'application/json' },
              body: JSON.stringify({
                  questionId: newQ.id,
                  text: answerText,
-                 isCorrect: true, // Assume correct for the quick-add
+                 isCorrect: true,
                  orderIdx: 0
              })
          });
       }
 
-      fetchQuestions();
+      mutate(); // Refresh the list automatically
       setIsModalOpen(false);
       setQForm({ text: '', type: 'single', isPrivate: false });
       setAnswerText('');
@@ -98,16 +76,15 @@ export const MyQuestionsTab = () => {
   const handleDeleteQuestion = async (id: number) => {
     if (!confirm('Delete this question?')) return;
     try {
-      await fetchWithAuth(`/api/questions/${id}`, {
-        method: 'DELETE',
-      });
-      setQuestions(prev => prev.filter(q => q.id !== id));
+      await fetchWithAuth(`/api/questions/${id}`, { method: 'DELETE' });
+      mutate();
     } catch (e) {
       alert('Failed to delete');
     }
   };
 
-  if (loading) return <div>Loading questions...</div>;
+  if (isLoading) return <Loader />;
+  if (error) return <div>Error loading questions</div>;
 
   return (
     <div>
@@ -169,7 +146,6 @@ export const MyQuestionsTab = () => {
              placeholder="Enter the correct answer text"
              value={answerText}
              onChange={e => setAnswerText(e.target.value)}
-             // Note: This is a simplified way to add ONE answer. Real UI would allow adding multiple options.
            />
 
            <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
@@ -181,4 +157,3 @@ export const MyQuestionsTab = () => {
     </div>
   );
 };
-

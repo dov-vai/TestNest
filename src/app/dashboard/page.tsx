@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { useRouter } from 'next/navigation';
 import { Loader } from '@/components/ui/Loader';
 import { FileText, History, HelpCircle } from 'lucide-react';
@@ -12,46 +11,16 @@ import { MyQuestionsTab } from '@/components/dashboard/MyQuestionsTab';
 
 export default function DashboardPage() {
   const { user, accessToken } = useAuth();
-  const fetchWithAuth = useAuthenticatedFetch();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<'topics' | 'attempts' | 'questions'>('topics');
-  
-  const [myTopics, setMyTopics] = useState<any[]>([]);
-  const [myAttempts, setMyAttempts] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchData = async () => {
-      try {
-        if (!accessToken || !user) return;
-        
-        // Fetch Topics
-        const topicsRes = await fetchWithAuth('/api/topics');
-        const topicsData = await topicsRes.json();
-        setMyTopics(topicsData.filter((t: any) => t.userId === user.id));
-
-        // Fetch Attempts
-        const attemptsRes = await fetchWithAuth('/api/attempts');
-        const attemptsData = await attemptsRes.json();
-        setMyAttempts(attemptsData);
-
-      } catch (error) {
-        console.error('Failed to fetch dashboard data', error);
-      } finally {
-        setLoading(false);
-      }
-  };
 
   useEffect(() => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-    if (accessToken) {
-         fetchData();
+    if (!user && !accessToken) {
+        router.push('/login');
     }
   }, [user, accessToken, router]);
 
-  if (loading) return <Loader />;
+  if (!user) return <Loader />;
 
   return (
     <div>
@@ -93,17 +62,12 @@ export default function DashboardPage() {
         </nav>
       </div>
 
-      {activeTab === 'topics' && (
-        <MyTopicsTab topics={myTopics} loading={loading} onRefresh={fetchData} />
-      )}
 
-      {activeTab === 'questions' && (
-        <MyQuestionsTab />
-      )}
+      {activeTab === 'topics' && <MyTopicsTab />}
 
-      {activeTab === 'attempts' && (
-        <MyAttemptsTab attempts={myAttempts} loading={loading} />
-      )}
+      {activeTab === 'questions' && <MyQuestionsTab />}
+
+      {activeTab === 'attempts' && <MyAttemptsTab />}
     </div>
   );
 }

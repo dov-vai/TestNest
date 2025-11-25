@@ -1,4 +1,10 @@
+'use client';
+
 import React from 'react';
+import useSWR from 'swr';
+import { useAuth } from '@/contexts/AuthContext';
+import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
+import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 
 interface Attempt {
@@ -11,21 +17,30 @@ interface Attempt {
   isCompleted: boolean;
 }
 
-interface MyAttemptsTabProps {
-  attempts: Attempt[];
-  loading: boolean;
-}
+export const MyAttemptsTab: React.FC = () => {
+  const { user } = useAuth();
+  const fetchWithAuth = useAuthenticatedFetch();
 
-export const MyAttemptsTab: React.FC<MyAttemptsTabProps> = ({ attempts, loading }) => {
-  if (loading) return <div>Loading attempts...</div>;
+  const fetcher = (url: string) => fetchWithAuth(url).then(res => {
+      if(!res.ok) throw new Error("Failed to fetch attempts");
+      return res.json();
+  });
+
+  const { data: attempts, error, isLoading } = useSWR(
+    user ? '/api/attempts' : null, 
+    fetcher
+  );
+
+  if (isLoading) return <Loader />;
+  if (error) return <div>Error loading attempts</div>;
 
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-md">
       <ul className="divide-y divide-gray-200">
-        {attempts.length === 0 ? (
+        {!attempts || attempts.length === 0 ? (
           <li className="px-4 py-4 sm:px-6 text-center text-gray-500">No attempts found.</li>
         ) : (
-          attempts.map((attempt) => (
+          attempts.map((attempt: Attempt) => (
             <li key={attempt.id}>
               <Link href={`/attempts/${attempt.id}`} className="block hover:bg-gray-50">
                 <div className="px-4 py-4 sm:px-6">
@@ -64,4 +79,3 @@ export const MyAttemptsTab: React.FC<MyAttemptsTabProps> = ({ attempts, loading 
     </div>
   );
 };
-

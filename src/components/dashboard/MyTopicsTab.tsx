@@ -1,10 +1,14 @@
+'use client';
+
 import React, { useState } from 'react';
+import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { TopicCard } from '@/components/topics/TopicCard';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
+import { Loader } from '@/components/ui/Loader';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,15 +20,23 @@ interface Topic {
   userId: number;
 }
 
-interface MyTopicsTabProps {
-  topics: Topic[];
-  loading: boolean;
-  onRefresh: () => void;
-}
-
-export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRefresh }) => {
-  const { accessToken, user } = useAuth();
+export const MyTopicsTab: React.FC = () => {
+  const { user } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
+  
+  const fetcher = (url: string) => fetchWithAuth(url).then((res) => {
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  });
+
+  const { data, error, isLoading, mutate } = useSWR(
+    user ? '/api/topics' : null, 
+    fetcher
+  );
+
+  // Filter client-side
+  const topics: Topic[] = data ? data.filter((t: any) => t.userId === user?.id) : [];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
   const [topicForm, setTopicForm] = useState({ title: '', description: '', isPrivate: false });
@@ -39,17 +51,15 @@ export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRef
 
       const res = await fetchWithAuth(url, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(topicForm),
       });
 
       if (!res.ok) throw new Error('Failed to save topic');
       
       setIsModalOpen(false);
-      onRefresh();
       resetForm();
+      mutate();
     } catch (err) {
       alert('Error saving topic');
     } finally {
@@ -60,11 +70,9 @@ export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRef
   const handleDeleteTopic = async (id: number) => {
     if (!confirm('Are you sure? This will delete all questions and attempts associated with this topic.')) return;
     try {
-      const res = await fetchWithAuth(`/api/topics/${id}`, {
-        method: 'DELETE',
-      });
+      const res = await fetchWithAuth(`/api/topics/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete');
-      onRefresh();
+      mutate();
     } catch (err) {
       alert('Error deleting topic');
     }
@@ -90,7 +98,8 @@ export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRef
     setTopicForm({ title: '', description: '', isPrivate: false });
   };
 
-  if (loading) return <div>Loading topics...</div>;
+  if (isLoading) return <Loader />;
+  if (error) return <div>Error loading topics.</div>;
 
   return (
     <div>
@@ -118,20 +127,14 @@ export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRef
                   <FileText className="h-4 w-4" />
                 </Link>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    openEditModal(topic);
-                  }}
+                  onClick={(e) => { e.preventDefault(); openEditModal(topic); }}
                   className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-indigo-600"
                   title="Edit"
                 >
                   <Edit2 className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleDeleteTopic(topic.id);
-                  }}
+                  onClick={(e) => { e.preventDefault(); handleDeleteTopic(topic.id); }}
                   className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-red-600"
                   title="Delete"
                 >
@@ -194,4 +197,3 @@ export const MyTopicsTab: React.FC<MyTopicsTabProps> = ({ topics, loading, onRef
     </div>
   );
 };
-

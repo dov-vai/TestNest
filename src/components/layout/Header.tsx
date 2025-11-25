@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Menu, X, LogOut, User, Bird } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -9,8 +10,29 @@ import { Button } from '@/components/ui/Button';
 export function Header() {
   const { user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const getDesktopLinkClass = (path: string) => {
+    const baseClass = "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors";
+    const activeClass = "border-indigo-500 text-gray-900";
+    const inactiveClass = "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700";
+
+    return pathname === path 
+      ? `${baseClass} ${activeClass}` 
+      : `${baseClass} ${inactiveClass}`;
+  };
+
+  const getMobileLinkClass = (path: string) => {
+    const baseClass = "block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors";
+    const activeClass = "bg-indigo-50 border-indigo-500 text-indigo-700";
+    const inactiveClass = "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700";
+
+    return pathname === path 
+      ? `${baseClass} ${activeClass}` 
+      : `${baseClass} ${inactiveClass}`;
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -26,14 +48,14 @@ export function Header() {
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
                 href="/"
-                className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                className={getDesktopLinkClass('/')}
               >
-                Public Tests
+                Tests
               </Link>
               {user && (
                 <Link
                   href="/dashboard"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className={getDesktopLinkClass('/dashboard')}
                 >
                   My Dashboard
                 </Link>
@@ -41,7 +63,7 @@ export function Header() {
               {user && user.role === 'admin' && (
                 <Link
                   href="/admin"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className={getDesktopLinkClass('/admin')}
                 >
                   Admin
                 </Link>
@@ -87,15 +109,15 @@ export function Header() {
             <Link
               href="/"
               onClick={() => setIsMenuOpen(false)}
-              className="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+              className={getMobileLinkClass('/')}
             >
-              Public Tests
+              Tests
             </Link>
             {user && (
               <Link
                 href="/dashboard"
                 onClick={() => setIsMenuOpen(false)}
-                className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                className={getMobileLinkClass('/dashboard')}
               >
                 My Dashboard
               </Link>
@@ -104,9 +126,9 @@ export function Header() {
                 <Link
                   href="/admin"
                   onClick={() => setIsMenuOpen(false)}
-                  className="border-transparent text-purple-600 hover:bg-purple-50 hover:border-purple-300 hover:text-purple-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                  className={getMobileLinkClass('/admin')}
                 >
-                  Admin Dashboard
+                  Admin
                 </Link>
               )}
           </div>

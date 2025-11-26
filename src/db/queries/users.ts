@@ -1,4 +1,4 @@
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, asc, isNull } from 'drizzle-orm';
 import { db } from '../client';
 import { users, refreshTokens } from '../schema';
 import { hashPassword } from '@/lib/auth';
@@ -15,8 +15,8 @@ export async function findUserById(id: number) {
   return result[0] || null;
 }
 
-export async function getAllUsers() {
-  return db
+export async function listUsers({ limit, offset }: { limit: number; offset: number }) {
+  const rows = await db
     .select({
       id: users.id,
       email: users.email,
@@ -26,7 +26,12 @@ export async function getAllUsers() {
       createdAt: users.createdAt,
       updatedAt: users.updatedAt,
     })
-    .from(users);
+    .from(users)
+    .limit(limit)
+    .offset(offset)
+    .orderBy(asc(users.id));
+
+  return rows;
 }
 
 export async function createUser(data: { email: string; password: string; name?: string }) {

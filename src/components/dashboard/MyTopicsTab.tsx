@@ -12,6 +12,7 @@ import { Loader } from '@/components/ui/Loader';
 import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { TextArea } from '../ui/TextArea';
+import { PaginationBar } from '../ui/PaginationBar';
 
 interface Topic {
   id: number;
@@ -21,22 +22,29 @@ interface Topic {
   userId: number;
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export const MyTopicsTab: React.FC = () => {
   const { user } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
-  
-  const fetcher = (url: string) => fetchWithAuth(url).then((res) => {
-    if (!res.ok) throw new Error('Failed to fetch');
-    return res.json();
-  });
+  const [page, setPage] = useState(1);
 
-  const { data, error, isLoading, mutate } = useSWR(
-    user ? '/api/topics' : null, 
-    fetcher
-  );
+  const fetcher = (url: string) =>
+    fetchWithAuth(url).then((res) => {
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    });
 
-  // Filter client-side
-  const topics: Topic[] = data ? data.filter((t: any) => t.userId === user?.id) : [];
+  const offset = (page - 1) * ITEMS_PER_PAGE;
+  // Use creator_id to fetch only my topics from server
+  const {
+    data: topics,
+    error,
+    isLoading,
+    mutate,
+  } = useSWR(user ? `/api/topics?limit=${ITEMS_PER_PAGE}&offset=${offset}&creator_id=${user.id}` : null, fetcher);
+
+  const hasMore = topics && topics.length === ITEMS_PER_PAGE;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
@@ -59,7 +67,7 @@ export const MyTopicsTab: React.FC = () => {
       });
 
       if (!res.ok) throw new Error('Failed to save topic');
-      
+
       setIsModalOpen(false);
       resetForm();
       mutate();
@@ -115,41 +123,47 @@ export const MyTopicsTab: React.FC = () => {
         </Button>
       </div>
 
-      {topics.length === 0 ? (
+      {!topics || topics.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
           <p className="text-gray-500">You haven't created any topics yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {topics.map((topic) => (
-            <div key={topic.id} className="relative group">
-              <TopicCard topic={topic} />
-              <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Link
-                  href={`/topics/${topic.id}/manage`}
-                  className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-green-600"
-                  title="Manage Questions"
-                >
-                  <FileText className="h-4 w-4" />
-                </Link>
-                <button
-                  onClick={(e) => { e.preventDefault(); openEditModal(topic); }}
-                  className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-indigo-600"
-                  title="Edit"
-                >
-                  <Edit2 className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={(e) => { e.preventDefault(); setConfirmTopicId(topic.id); }}
-                  className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-red-600"
-                  title="Delete"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+        <>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {topics.map((topic: Topic) => (
+              <div key={topic.id} className="relative group">
+                <TopicCard topic={topic} />
+                <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Link
+                    href={`/topics/${topic.id}/manage`}
+                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-green-600"
+                  >
+                    <FileText className="h-4 w-4" />
+                  </Link>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      openEditModal(topic);
+                    }}
+                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-indigo-600"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setConfirmTopicId(topic.id);
+                    }}
+                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+          <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />
+        </>
       )}
 
       <Modal
@@ -201,14 +215,20 @@ export const MyTopicsTab: React.FC = () => {
       </Modal>
       <Modal
         isOpen={confirmTopicId !== null}
-        onClose={() => { if (!deleting) setConfirmTopicId(null); }}
+        onClose={() => {
+          if (!deleting) setConfirmTopicId(null);
+        }}
         title="Delete Topic"
         footer={
           <>
             <Button variant="outline" onClick={() => setConfirmTopicId(null)} className="w-full sm:w-auto">
               Cancel
             </Button>
-            <Button onClick={() => confirmTopicId !== null && handleDeleteTopic(confirmTopicId)} isLoading={deleting} className="w-full sm:w-auto">
+            <Button
+              onClick={() => confirmTopicId !== null && handleDeleteTopic(confirmTopicId)}
+              isLoading={deleting}
+              className="w-full sm:w-auto"
+            >
               Yes, Delete
             </Button>
           </>

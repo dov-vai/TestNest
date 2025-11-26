@@ -14,8 +14,8 @@ import { authenticate, requireAuth, isAdmin } from '../_lib/middleware';
 export async function GET(req: NextRequest) {
   try {
     const user = await authenticate(req);
-
     const { searchParams } = new URL(req.url);
+
     const parsed = paginationSchema.safeParse({
       limit: searchParams.get('limit'),
       offset: searchParams.get('offset'),
@@ -23,7 +23,13 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
 
-    const data = await listQuestions(db, { limit, offset }, user?.userId, isAdmin(user));
+    const creatorIdParam = searchParams.get('creator_id');
+    const creatorId = creatorIdParam ? parseInt(creatorIdParam) : undefined;
+
+    // Strict creator filtering logic similar to topics
+    const effectiveCreatorId = creatorId && (creatorId === user?.userId || isAdmin(user)) ? creatorId : undefined;
+
+    const data = await listQuestions(db, { limit, offset }, user?.userId, isAdmin(user), effectiveCreatorId);
     return json(data);
   } catch (e) {
     return serverError(e);

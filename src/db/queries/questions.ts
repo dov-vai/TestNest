@@ -4,12 +4,25 @@ import { eq, asc, inArray, or, and } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
 
-export async function listQuestions(db: DB, { limit, offset }: Pagination, userId?: number, isAdmin?: boolean) {
-  const whereClause = isAdmin
-    ? undefined // No filter for admins - show all questions
-    : userId
-      ? or(eq(questions.isPrivate, false), and(eq(questions.userId, userId), eq(questions.isPrivate, true)))
-      : eq(questions.isPrivate, false);
+export async function listQuestions(
+  db: DB,
+  { limit, offset }: Pagination,
+  userId?: number,
+  isAdmin?: boolean,
+  creatorId?: number // Add this parameter
+) {
+  let whereClause;
+
+  if (creatorId) {
+    // Strictly filter by creator (for "My Questions")
+    whereClause = eq(questions.userId, creatorId);
+  } else if (isAdmin) {
+    whereClause = undefined;
+  } else if (userId) {
+    whereClause = or(eq(questions.isPrivate, false), and(eq(questions.userId, userId), eq(questions.isPrivate, true)));
+  } else {
+    whereClause = eq(questions.isPrivate, false);
+  }
 
   const query = db.select().from(questions);
 

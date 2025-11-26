@@ -13,12 +13,9 @@ import { authenticate, requireAuth, isAdmin } from '../_lib/middleware';
  */
 export async function GET(req: NextRequest) {
   try {
-    // Authentication is optional for listing - users can see public topics
-    // If authenticated, they can also see their own private topics
-    // Admins can see all topics including private ones
     const user = await authenticate(req);
-
     const { searchParams } = new URL(req.url);
+
     const parsed = paginationSchema.safeParse({
       limit: searchParams.get('limit'),
       offset: searchParams.get('offset'),
@@ -26,7 +23,21 @@ export async function GET(req: NextRequest) {
     if (!parsed.success) return badRequest(parsed.error);
     const { limit, offset } = parsed.data;
 
-    const data = await listTopics(db, { limit, offset }, user?.userId, isAdmin(user));
+    // Check for creator_id filter
+    const creatorIdParam = searchParams.get('creator_id');
+    const creatorId = creatorIdParam ? parseInt(creatorIdParam) : undefined;
+
+    // If filtering by creator, verify permissions (users can only filter their own, admins can filter any)
+    if (creatorId && creatorId !== user?.userId && !isAdmin(user)) {
+      // Fallback to standard logic if they try to snoop, or throw error.
+      // For now, let's just ignore the param if they aren't authorized to filter by others
+      // But usually for "My Topics", creatorId == user.userId
+    }
+
+    // Pass creatorId (if valid) to query
+    const effectiveCreatorId = creatorId && (creatorId === user?.userId || isAdmin(user)) ? creatorId : undefined;
+
+    const data = await listTopics(db, { limit, offset }, user?.userId, isAdmin(user), effectiveCreatorId);
     return json(data);
   } catch (e) {
     return serverError(e);

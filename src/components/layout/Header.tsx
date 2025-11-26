@@ -15,23 +15,19 @@ export function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const getDesktopLinkClass = (path: string) => {
-    const baseClass = "inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors";
-    const activeClass = "border-indigo-500 text-gray-900";
-    const inactiveClass = "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700";
+    const baseClass = 'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors';
+    const activeClass = 'border-indigo-500 text-gray-900';
+    const inactiveClass = 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700';
 
-    return pathname === path 
-      ? `${baseClass} ${activeClass}` 
-      : `${baseClass} ${inactiveClass}`;
+    return pathname === path ? `${baseClass} ${activeClass}` : `${baseClass} ${inactiveClass}`;
   };
 
   const getMobileLinkClass = (path: string) => {
-    const baseClass = "block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors";
-    const activeClass = "bg-indigo-50 border-indigo-500 text-indigo-700";
-    const inactiveClass = "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700";
+    const baseClass = 'block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors';
+    const activeClass = 'bg-indigo-50 border-indigo-500 text-indigo-700';
+    const inactiveClass = 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700';
 
-    return pathname === path 
-      ? `${baseClass} ${activeClass}` 
-      : `${baseClass} ${inactiveClass}`;
+    return pathname === path ? `${baseClass} ${activeClass}` : `${baseClass} ${inactiveClass}`;
   };
 
   return (
@@ -46,25 +42,16 @@ export function Header() {
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              <Link
-                href="/"
-                className={getDesktopLinkClass('/')}
-              >
+              <Link href="/tests" className={getDesktopLinkClass('/tests')}>
                 Tests
               </Link>
               {user && (
-                <Link
-                  href="/dashboard"
-                  className={getDesktopLinkClass('/dashboard')}
-                >
+                <Link href="/dashboard" className={getDesktopLinkClass('/dashboard')}>
                   My Dashboard
                 </Link>
               )}
               {user && user.role === 'admin' && (
-                <Link
-                  href="/admin"
-                  className={getDesktopLinkClass('/admin')}
-                >
+                <Link href="/admin" className={getDesktopLinkClass('/admin')}>
                   Admin
                 </Link>
               )}
@@ -82,10 +69,14 @@ export function Header() {
             ) : (
               <div className="flex items-center gap-4">
                 <Link href="/login">
-                  <Button variant="ghost" size="sm">Login</Button>
+                  <Button variant="ghost" size="sm">
+                    Login
+                  </Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="primary" size="sm">Register</Button>
+                  <Button variant="primary" size="sm">
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}
@@ -106,31 +97,19 @@ export function Header() {
       {isMenuOpen && (
         <div className="sm:hidden border-t border-gray-200">
           <div className="pt-2 pb-3 space-y-1">
-            <Link
-              href="/"
-              onClick={() => setIsMenuOpen(false)}
-              className={getMobileLinkClass('/')}
-            >
+            <Link href="/tests" onClick={() => setIsMenuOpen(false)} className={getMobileLinkClass('/tests')}>
               Tests
             </Link>
             {user && (
-              <Link
-                href="/dashboard"
-                onClick={() => setIsMenuOpen(false)}
-                className={getMobileLinkClass('/dashboard')}
-              >
+              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className={getMobileLinkClass('/dashboard')}>
                 My Dashboard
               </Link>
             )}
-             {user && user.role === 'admin' && (
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMenuOpen(false)}
-                  className={getMobileLinkClass('/admin')}
-                >
-                  Admin
-                </Link>
-              )}
+            {user && user.role === 'admin' && (
+              <Link href="/admin" onClick={() => setIsMenuOpen(false)} className={getMobileLinkClass('/admin')}>
+                Admin
+              </Link>
+            )}
           </div>
           <div className="pt-4 pb-4 border-t border-gray-200">
             {user ? (
@@ -154,11 +133,15 @@ export function Header() {
               </div>
             ) : (
               <div className="flex flex-col gap-2 px-4">
-                 <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="outline" className="w-full justify-center">Login</Button>
+                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                  <Button variant="outline" className="w-full justify-center">
+                    Login
+                  </Button>
                 </Link>
                 <Link href="/register" onClick={() => setIsMenuOpen(false)}>
-                  <Button variant="primary" className="w-full justify-center">Register</Button>
+                  <Button variant="primary" className="w-full justify-center">
+                    Register
+                  </Button>
                 </Link>
               </div>
             )}

@@ -14,7 +14,13 @@ interface Topic {
   isPrivate: boolean;
 }
 
-export function TopicList() {
+interface TopicListProps {
+  page?: number;
+  itemsPerPage?: number;
+  onDataLoaded?: (hasData: boolean, isFullPage: boolean) => void;
+}
+
+export function TopicList({ page = 1, itemsPerPage = 10, onDataLoaded }: TopicListProps) {
   const { accessToken, hasInitialized } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -26,12 +32,16 @@ export function TopicList() {
 
     const fetchTopics = async () => {
       try {
-        const response = await fetchWithAuth('/api/topics');
+        const response = await fetchWithAuth(`/api/topics?limit=${itemsPerPage}&offset=${(page - 1) * itemsPerPage}`);
         if (!response.ok) {
           throw new Error('Failed to fetch topics');
         }
         const data = await response.json();
         setTopics(data);
+
+        if (onDataLoaded) {
+          onDataLoaded(data.length > 0, data.length === itemsPerPage);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -40,10 +50,10 @@ export function TopicList() {
     };
 
     fetchTopics();
-  }, [accessToken, hasInitialized, fetchWithAuth]);
+  }, [accessToken, hasInitialized, fetchWithAuth, page, itemsPerPage, onDataLoaded]);
 
   if (loading) return <Loader />;
-  
+
   if (error) {
     return (
       <div className="text-center py-12">

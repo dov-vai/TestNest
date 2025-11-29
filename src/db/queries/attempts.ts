@@ -1,5 +1,5 @@
 import { DB } from '@/db/client';
-import { userTopicAttempts, userAnswers, topicQuestions, answers, questions } from '@/db/schema';
+import { userTopicAttempts, userAnswers, topicQuestions, answers, questions, topics } from '@/db/schema';
 import { eq, and, desc, inArray } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
@@ -23,8 +23,18 @@ export async function getAttemptById(db: DB, id: number) {
 
 export async function listUserAttempts(db: DB, userId: number, { limit, offset }: Pagination) {
   return db
-    .select()
+    .select({
+      id: userTopicAttempts.id,
+      topicId: userTopicAttempts.topicId,
+      topicTitle: topics.title,
+      startedAt: userTopicAttempts.startedAt,
+      submittedAt: userTopicAttempts.submittedAt,
+      totalPoints: userTopicAttempts.totalPoints,
+      earnedPoints: userTopicAttempts.earnedPoints,
+      isCompleted: userTopicAttempts.isCompleted,
+    })
     .from(userTopicAttempts)
+    .innerJoin(topics, eq(userTopicAttempts.topicId, topics.id))
     .where(eq(userTopicAttempts.userId, userId))
     .orderBy(desc(userTopicAttempts.startedAt))
     .limit(limit)

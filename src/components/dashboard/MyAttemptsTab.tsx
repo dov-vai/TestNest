@@ -11,6 +11,7 @@ import { PaginationBar } from '../ui/PaginationBar';
 interface Attempt {
   id: number;
   topicId: number;
+  topicTitle: string;
   startedAt: string;
   submittedAt?: string;
   totalPoints: number;
@@ -55,7 +56,7 @@ export const MyAttemptsTab: React.FC = () => {
                 <Link href={`/attempts/${attempt.id}`} className="block hover:bg-gray-50">
                   <div className="px-4 py-4 sm:px-6">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-indigo-600 truncate">Topic ID: {attempt.topicId}</p>
+                      <p className="text-sm font-medium text-indigo-600 truncate">{attempt.topicTitle}</p>
                       <div className="ml-2 flex-shrink-0 flex">
                         <p
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${attempt.isCompleted ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}

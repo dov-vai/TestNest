@@ -5,11 +5,12 @@ import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Loader } from '@/components/ui/Loader';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, Edit } from 'lucide-react';
 import { PaginationBar } from '../ui/PaginationBar';
+import { CreateQuestionModal } from './CreateQuestionModal';
+import { EditQuestionModal } from './EditQuestionModal';
 
 interface Question {
   id: number;
@@ -39,53 +40,20 @@ export const MyQuestionsTab = () => {
 
   const hasMore = questions && questions.length === ITEMS_PER_PAGE;
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [formLoading, setFormLoading] = useState(false);
-  const [qForm, setQForm] = useState({ text: '', type: 'single', isPrivate: false });
-  const [answerText, setAnswerText] = useState('');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [questionToEdit, setQuestionToEdit] = useState<number | null>(null);
   const [questionToDelete, setQuestionToDelete] = useState<number | null>(null);
-
-  const handleCreateQuestion = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormLoading(true);
-    try {
-      const qRes = await fetchWithAuth('/api/questions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(qForm),
-      });
-
-      if (!qRes.ok) throw new Error('Failed to create question');
-      const newQ = await qRes.json();
-
-      if (answerText) {
-        await fetchWithAuth('/api/answers', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            questionId: newQ.id,
-            text: answerText,
-            isCorrect: true,
-            orderIdx: 0,
-          }),
-        });
-      }
-
-      mutate(); // Refresh the list automatically
-      setIsModalOpen(false);
-      setQForm({ text: '', type: 'single', isPrivate: false });
-      setAnswerText('');
-    } catch (e) {
-      alert('Failed to create question');
-    } finally {
-      setFormLoading(false);
-    }
-  };
 
   const openDeleteModal = (id: number) => {
     setQuestionToDelete(id);
     setIsDeleteModalOpen(true);
+  };
+
+  const openEditModal = (id: number) => {
+    setQuestionToEdit(id);
+    setIsEditModalOpen(true);
   };
 
   const confirmDeleteQuestion = async () => {
@@ -107,7 +75,7 @@ export const MyQuestionsTab = () => {
   return (
     <div>
       <div className="mb-6 flex justify-end">
-        <Button onClick={() => setIsModalOpen(true)}>
+        <Button onClick={() => setIsCreateModalOpen(true)}>
           <Plus className="mr-2 h-5 w-5" /> Create Question
         </Button>
       </div>
@@ -117,15 +85,28 @@ export const MyQuestionsTab = () => {
           {questions.length === 0 ? (
             <li className="px-4 py-4 text-center text-gray-500">No questions found.</li>
           ) : (
-            questions.map((q) => (
+            questions.map((q: Question) => (
               <li key={q.id} className="px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-gray-50">
                 <div>
                   <p className="text-sm font-medium text-indigo-600">{q.text}</p>
                   <p className="text-xs text-gray-500">Type: {q.type}</p>
                 </div>
-                <button onClick={() => openDeleteModal(q.id)} className="text-red-600 hover:text-red-800">
-                  <Trash2 className="h-5 w-5" />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => openEditModal(q.id)}
+                    className="text-indigo-600 hover:text-indigo-800"
+                    title="Edit question"
+                  >
+                    <Edit className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(q.id)}
+                    className="text-red-600 hover:text-red-800"
+                    title="Delete question"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
               </li>
             ))
           )}
@@ -136,51 +117,21 @@ export const MyQuestionsTab = () => {
         <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />
       )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create New Question">
-        <form onSubmit={handleCreateQuestion} className="space-y-4">
-          <Input
-            label="Question Text"
-            value={qForm.text}
-            onChange={(e) => setQForm({ ...qForm, text: e.target.value })}
-            required
-          />
+      <CreateQuestionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onSuccess={() => mutate()}
+      />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-            <select
-              className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              value={qForm.type}
-              onChange={(e) => setQForm({ ...qForm, type: e.target.value })}
-            >
-              <option value="single">Single Choice</option>
-              <option value="multi">Multiple Choice</option>
-              <option value="true_false">True/False</option>
-              <option value="fill_blank">Fill in Blank</option>
-            </select>
-          </div>
-
-          <Input
-            label="Correct Answer (Quick Add)"
-            placeholder="Enter the correct answer text"
-            value={answerText}
-            onChange={(e) => setAnswerText(e.target.value)}
-          />
-
-          <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-            <Button type="submit" isLoading={formLoading} className="w-full sm:ml-3 sm:w-auto">
-              Create
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setIsModalOpen(false)}
-              className="mt-3 w-full sm:mt-0 sm:w-auto"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <EditQuestionModal
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setQuestionToEdit(null);
+        }}
+        onSuccess={() => mutate()}
+        questionId={questionToEdit}
+      />
 
       <Modal
         isOpen={isDeleteModalOpen}

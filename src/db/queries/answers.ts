@@ -75,6 +75,11 @@ export async function deleteAnswer(db: DB, id: number) {
   return deleted ?? null;
 }
 
+export async function listAnswersByQuestionId(db: DB, questionId: number): Promise<Array<Answer>> {
+  const rows = await db.select().from(answers).where(eq(answers.questionId, questionId)).orderBy(asc(answers.orderIdx));
+  return rows;
+}
+
 export async function listAnswersByQuestionIds(db: DB, questionIds: number[]): Promise<Array<Answer>> {
   if (questionIds.length === 0) return [];
   const rows = await db

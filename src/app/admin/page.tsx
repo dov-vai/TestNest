@@ -5,12 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { UserManagement } from '@/components/admin/UserManagement';
 import { AdminTopicManagement } from '@/components/admin/AdminTopicManagement';
-import { Users, BookOpen } from 'lucide-react';
+import { AdminQuestionManagement } from '@/components/admin/AdminQuestionManagement';
+import { Users, BookOpen, HelpCircle } from 'lucide-react';
 
 export default function AdminDashboardPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'users' | 'topics'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'topics' | 'questions'>('users');
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== 'admin')) {
@@ -53,13 +54,29 @@ export default function AdminDashboardPage() {
             <BookOpen className="mr-2 h-5 w-5" />
             Topic Management
           </button>
+          <button
+            onClick={() => setActiveTab('questions')}
+            className={`${
+              activeTab === 'questions'
+                ? 'border-indigo-500 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
+          >
+            <HelpCircle className="mr-2 h-5 w-5" />
+            Question Management
+          </button>
         </nav>
       </div>
 
       <div className="mt-6">
-        {activeTab === 'users' ? <UserManagement /> : <AdminTopicManagement />}
+        {activeTab === 'users' ? (
+          <UserManagement />
+        ) : activeTab === 'topics' ? (
+          <AdminTopicManagement />
+        ) : (
+          <AdminQuestionManagement />
+        )}
       </div>
     </div>
   );
 }
-

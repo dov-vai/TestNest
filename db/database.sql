@@ -96,11 +96,11 @@ CREATE TABLE IF NOT EXISTS user_answer (
   user_answer_text TEXT,
   is_correct BOOLEAN NOT NULL DEFAULT false,
   points_awarded INTEGER NOT NULL DEFAULT 0,
-  answered_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  CONSTRAINT uq_attempt_topic_question UNIQUE (attempt_id, topic_question_id)
+  answered_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_ua_attempt_id ON user_answer(attempt_id);
 CREATE INDEX IF NOT EXISTS idx_ua_topic_question_id ON user_answer(topic_question_id);
+CREATE INDEX IF NOT EXISTS idx_ua_answer_id ON user_answer(answer_id);
 
 CREATE OR REPLACE FUNCTION set_updated_at()
 RETURNS TRIGGER AS $$

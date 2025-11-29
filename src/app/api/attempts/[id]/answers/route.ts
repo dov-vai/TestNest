@@ -31,16 +31,16 @@ export async function POST(req: NextRequest, context: { params: Promise<{ id: st
     }
 
     const body = await req.json();
-    const { topicQuestionId, answerId, userAnswerText } = answerSubmitSchema.parse(body);
+    const { topicQuestionId, answerIds, userAnswerText } = answerSubmitSchema.parse(body);
 
     // Check if answer is correct and calculate points
-    const { isCorrect, pointsAwarded } = await checkAnswer(db, topicQuestionId, answerId, userAnswerText);
+    const { isCorrect, pointsAwarded } = await checkAnswer(db, topicQuestionId, answerIds, userAnswerText);
 
     // Submit the answer
     const answer = await submitAnswer(db, {
       attemptId: Number(id),
       topicQuestionId,
-      answerId: answerId || null,
+      answerIds: answerIds || [],
       userAnswerText: userAnswerText || null,
       isCorrect,
       pointsAwarded,

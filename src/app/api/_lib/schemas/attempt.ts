@@ -7,7 +7,10 @@ export const attemptCreateSchema = z.object({
 
 export const answerSubmitSchema = z.object({
   topicQuestionId: z.number().int().positive().max(INT32_MAX).describe('Topic question link ID'),
-  answerId: z.number().int().positive().max(INT32_MAX).optional().describe('Selected answer ID (for multiple choice)'),
+  answerIds: z
+    .array(z.number().int().positive().max(INT32_MAX))
+    .optional()
+    .describe('Selected answer IDs (for multiple choice)'),
   userAnswerText: z.string().max(1000).optional().nullable().describe('Text answer (for fill in the blank)'),
 });
 
@@ -32,7 +35,7 @@ export const userAnswerSchema = z.object({
   id: z.number().int().positive(),
   attemptId: z.number().int().positive(),
   topicQuestionId: z.number().int().positive(),
-  answerId: z.number().int().positive().nullable(),
+  answerIds: z.array(z.number().int().positive()).optional(),
   userAnswerText: z.string().nullable(),
   isCorrect: z.boolean(),
   pointsAwarded: z.number().int().min(0),

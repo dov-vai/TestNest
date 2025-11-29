@@ -125,9 +125,9 @@ export const userAnswers = pgTable(
     answeredAt: timestamp('answered_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (ua) => [
-    uniqueIndex('uq_attempt_topic_question').on(ua.attemptId, ua.topicQuestionId),
     index('idx_ua_attempt_id').on(ua.attemptId),
     index('idx_ua_topic_question_id').on(ua.topicQuestionId),
+    index('idx_ua_answer_id').on(ua.answerId),
   ]
 );
 

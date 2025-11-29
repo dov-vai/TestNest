@@ -50,6 +50,9 @@ export default function ManageTopicPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState<number | null>(null);
   const [points, setPoints] = useState(10);
 
+  // "Create Question" Form
+  const [createQuestionPoints, setCreateQuestionPoints] = useState(10);
+
   const fetchData = async () => {
     try {
       const tqRes = await fetchWithAuth(`/api/topics/${id}/questions`);
@@ -188,6 +191,7 @@ export default function ManageTopicPage() {
         onClose={() => setIsCreateModalOpen(false)}
         onSuccess={fetchData}
         topicId={id}
+        initialPoints={createQuestionPoints}
       />
 
       <EditQuestionModal

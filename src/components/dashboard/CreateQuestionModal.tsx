@@ -18,14 +18,22 @@ interface CreateQuestionModalProps {
   onClose: () => void;
   onSuccess: () => void;
   topicId?: string | string[]; // Optional: if provided, will link question to topic
+  initialPoints?: number; // Points to assign when linking to topic
 }
 
-export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ isOpen, onClose, onSuccess, topicId }) => {
+export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
+  isOpen,
+  onClose,
+  onSuccess,
+  topicId,
+  initialPoints = 10,
+}) => {
   const fetchWithAuth = useAuthenticatedFetch();
   const [formLoading, setFormLoading] = useState(false);
   const [questionText, setQuestionText] = useState('');
   const [questionType, setQuestionType] = useState('single');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [points, setPoints] = useState(initialPoints);
 
   // Answers management
   const [answers, setAnswers] = useState<Answer[]>([]);
@@ -41,6 +49,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ isOpen
     setAnswers([]);
     setNewAnswerText('');
     setTrueFalseAnswer(true);
+    setPoints(initialPoints);
   };
 
   const addAnswer = () => {
@@ -156,7 +165,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ isOpen
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             questionId: newQuestion.id,
-            points: 10, // Default points
+            points: points,
             orderIdx: 0, // Will be appended
           }),
         });
@@ -325,6 +334,17 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({ isOpen
               <p className="text-xs text-gray-500 mt-1">Add at least 2 answers for choice questions</p>
             )}
           </div>
+        )}
+
+        {topicId && (
+          <Input
+            label="Points"
+            type="number"
+            value={points}
+            onChange={(e) => setPoints(Number(e.target.value))}
+            min={0}
+            required
+          />
         )}
 
         <div className="flex items-center">

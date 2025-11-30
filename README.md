@@ -1,48 +1,125 @@
-<h1 align="center">TestNest</h1>
+# TestNest
 
-# Goal
+# Sprendžiamo uždavinio aprašymas
 
-The goal of the project is to create an online platform for creating and taking tests, as well as for spaced repetition. The system should help learners more easily absorb knowledge, while teachers or instructors can more easily prepare sets of questions.
+## Sistemos paskirtis
 
-Viewing or taking tests will not require registration.  
-If a user wants to create tests, they will need to register on the platform. Once registered, the user can create a topic (a set of questions). A question may have single-choice, multiple-choice, yes/no, or open-ended answers. Questions can be reused and imported into other topics. A topic can be private or public, with public topics accessible to unregistered users. Test search will be available. After completing a test, the user can review the answers and see how many were correct (points scored).
+Projekto tikslas - sukurti internetinę platformą, skirtą testų kūrimui, atlikimui bei repeticiniam mokymuisi (angl. _Spaced repetition_). Sistema turėtų padėti besimokantiesiems lengviau įsisavinti žinias, o dėstytojams ar instruktoriams – paprasčiau parengti klausimų rinkinius.
 
-## Functional Requirements
+Norint peržiūrėti ar atlikti testus registracijos nereikalaus.
+Naudotojas, norėdamas kurti testus, prisiregistruos prie platformos. Tą padaręs galės sukurti temą (rinkinį klausimų), klausimas galės turėti vieno, kelių pasirinkų, taip/ne ir atvirojo tipo atsakymus. Klausimai gali būti perpanaudojami ir įkeliami į kitas temas. Tema gali būti privati arba vieša, prie kurios galės prieiti neregistruoti naudotojai. Veiks testų paieška. Atlikus testą galima peržiūrėti atsakymus ir kiek atsakyta teisingai (surinkta taškų).
 
-**Guest users will be able to:**
+## Funkciniai reikalavimai
 
-- Browse and view public tests;
-- Take tests;
-- Review test answers;
-- Log in / register on the platform.
+Svečias galės:
 
-**Registered users will be able to:**
+- Naršyti ir peržiūrėti viešus testus;
+- Atlikti testus;
+- Peržiūrėti testo atsakymus;
+- Prisijungti / registruotis platformoje.
 
-- Do everything a guest can do;
-- Create new tests;
-- View and manage their private tests;
-- Track their test history, progress, and points scored;
-- Add existing questions to their own tests;
-- Delete and edit tests.
+Registruotas naudotojas galės:
 
-**Administrators will be able to:**
+- Viską ką gali svečias;
+- Kurti naujus testus;
+- Peržiūrėti ir valdyti savo privačius testus;
+- Sekti testų atlikimo istoriją, progresą, surinktą taškų skaičių;
+- Pridėti esamus klausimus į savo testus;
+- Šalinti, redaguoti testus.
 
-- Do everything a registered user can do;
-- View, edit, or remove all user-created tests;
-- Manage user accounts (block, remove).
+Administratorius galės:
 
-# System Architecture
+- Viską ką gali registruotas naudotojas;
+- Peržiūrėti, redaguoti ar pašalinti visus naudotojų sukurtus testus;
+- Valdyti naudotojų paskyras (užblokuoti, pašalinti).
 
-The system will be developed using **Next.js**, which will serve both as the client and server side.
+# Sistemos architektūra
 
-**On the server side:**
+Sistema bus sukurta pasitelkiant **Next.js**, kuris tarnaus kaip klientinė ir serverinė pusė.
 
-- **Linux server** – main execution environment;
-- **Nginx** – reverse proxy, used to route requests, since several subdomains run on the server;
-- **JWT authentication** – for user login and session management;
-- **PostgreSQL** – relational database to store tests, questions, answers, and user data;
-- **Drizzle ORM** – lightweight ORM to simplify SQL operations.
+Serverio pusėje:
 
-The system deployment diagram is shown below.
+- **Linux serveris** – pagrindinė vykdymo aplinka.
+- **Nginx** – kaip atvirkštinis tarpininkas (angl. _Reverse proxy_), skirtas užklausų nukreipimui, kadangi serveryje veikia keli subdomenai.
+- **JWT autentifikacija** – naudotojų prisijungimui ir sesijų valdymui.
+- **PostgreSQL** – reliacinė duomenų bazė, skirta testams, klausimams, atsakymams ir naudotojų duomenims saugoti.
+- **Drizzle ORM** - mikro ORM SQL operacijoms palengvinti
 
-<img width="912" height="376" alt="deployment" src="https://github.com/user-attachments/assets/587da4e4-c3fc-4a0d-9ced-e4a352c62d37" />
+Žemiau pateikta sistemos diegimo diagrama. Sistema bus patalpinta Oracle Cloud serveryje. Aplikacija pasiekiama per HTTPS protokolą.
+
+![Sistemos diegimo diagrama](assets/deployment.png)
+
+# Naudotojo sąsaja
+
+## Pagrindinis puslapis
+
+![](/assets/image-1.png)
+
+![](/assets/image.png)
+
+## Prisijungimas
+
+![](/assets/image-3.png)
+
+![](/assets/image-2.png)
+
+## Naudotojo valdymo skydas
+
+![](/assets/image-4.png)
+
+![](/assets/image-5.png)
+
+## Temos klausimų valdymas
+
+![](/assets/image-6.png)
+
+![](/assets/image-7.png)
+
+## Naujo klausimo pridėjimo modalas
+
+![](/assets/image-8.png)
+
+![](/assets/image-9.png)
+
+## Esamo klausimo pridėjimas prie temos
+
+![](/assets/image-10.png)
+
+![](/assets/image-11.png)
+
+## Testo pradėjimas
+
+![](/assets/image-12.png)
+
+![](/assets/image-13.png)
+
+## Testo atlikimas
+
+![](/assets/image-14.png)
+
+![](/assets/image-15.png)
+
+## Testo rezultatai
+
+![](/assets/image-16.png)
+
+![](/assets/image-17.png)
+
+## Administratoriaus valdymo skydas
+
+![](/assets/image-19.png)
+
+![](/assets/image-20.png)
+
+# API specifikacija
+
+Prieinama [čia](/public/openapi.json) (openapi.json)
+
+# Išvados
+
+Pavyko pasiekti užsibrėžtus tikslus ir įgyvendinti testų atlikimo platformą:
+
+- Suprojektuota duombazė, API sąsaja;
+- Sukurta svetainė naudojant Next.js;
+- Veikia visi numatyti funkcionalumai skirtingoms rolėms;
+- Svetainė paleista debesyse ir prieinama naudotojams.

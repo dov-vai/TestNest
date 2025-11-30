@@ -128,12 +128,15 @@
             "exclusiveMinimum": true,
             "description": "Topic question link ID"
           },
-          "answerId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
+          "answerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
             "nullable": true,
-            "description": "Selected answer ID (for multiple choice)"
+            "description": "Selected answer IDs (for multiple choice)"
           },
           "userAnswerText": {
             "type": "string",
@@ -164,10 +167,13 @@
             "minimum": 0,
             "exclusiveMinimum": true
           },
-          "answerId": {
-            "type": "integer",
-            "minimum": 0,
-            "exclusiveMinimum": true,
+          "answerIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "exclusiveMinimum": true
+            },
             "nullable": true
           },
           "userAnswerText": {
@@ -182,7 +188,7 @@
             "minimum": 0
           },
           "answeredAt": {
-            "type": "string"
+            "type": "object"
           }
         },
         "required": [
@@ -2110,6 +2116,47 @@
         }
       }
     },
+    "/questions/{id}/answers": {
+      "get": {
+        "operationId": "get-questions-{id}-answers",
+        "summary": "Get answers for a specific question",
+        "description": "",
+        "tags": [
+          "Questions"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/answerListSchema"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          },
+          "401": {
+            "$ref": "#/components/responses/401"
+          },
+          "403": {
+            "$ref": "#/components/responses/403"
+          },
+          "404": {
+            "$ref": "#/components/responses/404"
+          },
+          "422": {
+            "$ref": "#/components/responses/422"
+          },
+          "500": {
+            "$ref": "#/components/responses/500"
+          }
+        }
+      }
+    },
     "/topics": {
       "get": {
         "operationId": "get-topics",
@@ -2597,7 +2644,7 @@
     "/users": {
       "get": {
         "operationId": "get-users",
-        "summary": "Get all users (admin only)",
+        "summary": "Get users (admin only) with pagination",
         "description": "",
         "tags": [
           "Users"

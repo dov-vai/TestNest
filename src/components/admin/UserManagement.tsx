@@ -126,7 +126,9 @@ export const UserManagement = () => {
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-4">User Management</h2>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white shadow overflow-hidden sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -212,6 +214,56 @@ export const UserManagement = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-4">
+        {users.map((user) => (
+          <div key={user.id} className="bg-white shadow rounded-lg p-4">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 h-10 w-10">
+                  <span className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    <UserIcon className="h-6 w-6 text-gray-500" />
+                  </span>
+                </div>
+                <div className="ml-3">
+                  <div className="text-sm font-medium text-gray-900">{user.name || 'No Name'}</div>
+                  <div className="text-sm text-gray-500">{user.email}</div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button onClick={() => handleEditUser(user)} className="text-indigo-600 hover:text-indigo-900">
+                  <Edit2 className="h-5 w-5" />
+                </button>
+                <button onClick={() => openDeleteModal(user.id)} className="text-red-600 hover:text-red-900">
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {user.role === 'admin' ? (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                  Admin
+                </span>
+              ) : (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  User
+                </span>
+              )}
+              {user.isActive ? (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  Active
+                </span>
+              ) : (
+                <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                  Inactive
+                </span>
+              )}
+            </div>
+            <div className="text-xs text-gray-500">Joined: {new Date(user.createdAt).toLocaleDateString()}</div>
+          </div>
+        ))}
       </div>
 
       {users.length > 0 && <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />}

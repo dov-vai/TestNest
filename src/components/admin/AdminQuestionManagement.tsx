@@ -84,7 +84,9 @@ export const AdminQuestionManagement = () => {
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-4">All Questions Management</h2>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white shadow overflow-hidden sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -160,6 +162,44 @@ export const AdminQuestionManagement = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-4">
+        {questions.map((question) => (
+          <div key={question.id} className="bg-white shadow rounded-lg p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 mb-2">{question.text}</p>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    {questionTypeLabels[question.type]}
+                  </span>
+                  {question.isPrivate ? (
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 flex items-center">
+                      <Lock className="h-3 w-3 mr-1" /> Private
+                    </span>
+                  ) : (
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+                      <Unlock className="h-3 w-3 mr-1" /> Public
+                    </span>
+                  )}
+                </div>
+              </div>
+              <button
+                onClick={() => openDeleteModal(question.id)}
+                className="text-red-600 hover:text-red-900 ml-2"
+                title="Delete"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>User #{question.userId}</span>
+              <span>{new Date(question.createdAt).toLocaleDateString()}</span>
+            </div>
+          </div>
+        ))}
       </div>
 
       {questions.length > 0 && <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />}

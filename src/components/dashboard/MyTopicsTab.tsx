@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import useSWR from 'swr';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
-import { TopicCard } from '@/components/topics/TopicCard';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Modal } from '@/components/ui/Modal';
 import { Loader } from '@/components/ui/Loader';
-import { Plus, Edit2, Trash2, FileText } from 'lucide-react';
+import { Plus, Edit2, Trash2, FileText, Lock, Unlock } from 'lucide-react';
 import Link from 'next/link';
 import { TextArea } from '../ui/TextArea';
 import { PaginationBar } from '../ui/PaginationBar';
@@ -129,38 +128,53 @@ export const MyTopicsTab: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {topics.map((topic: Topic) => (
-              <div key={topic.id} className="relative group">
-                <TopicCard topic={topic} />
-                <div className="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Link
-                    href={`/topics/${topic.id}/manage`}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-green-600"
-                  >
-                    <FileText className="h-4 w-4" />
-                  </Link>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      openEditModal(topic);
-                    }}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-indigo-600"
-                  >
-                    <Edit2 className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setConfirmTopicId(topic.id);
-                    }}
-                    className="p-1 bg-white rounded-full shadow hover:bg-gray-100 text-red-600"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className="bg-white shadow overflow-hidden sm:rounded-md">
+            <ul className="divide-y divide-gray-200">
+              {topics.map((topic: Topic) => (
+                <li key={topic.id} className="px-4 py-4 sm:px-6 hover:bg-gray-50">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <Link href={`/topics/${topic.id}`} className="block">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium text-indigo-600 truncate">{topic.title}</p>
+                          {topic.isPrivate ? (
+                            <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" title="Private" />
+                          ) : (
+                            <Unlock className="h-4 w-4 text-green-600 flex-shrink-0" title="Public" />
+                          )}
+                        </div>
+                        {topic.description && (
+                          <p className="text-xs text-gray-500 mt-1 line-clamp-2">{topic.description}</p>
+                        )}
+                      </Link>
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Link
+                        href={`/topics/${topic.id}/manage`}
+                        className="text-green-600 hover:text-green-800"
+                        title="Manage questions"
+                      >
+                        <FileText className="h-5 w-5" />
+                      </Link>
+                      <button
+                        onClick={() => openEditModal(topic)}
+                        className="text-indigo-600 hover:text-indigo-800"
+                        title="Edit topic"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                      <button
+                        onClick={() => setConfirmTopicId(topic.id)}
+                        className="text-red-600 hover:text-red-800"
+                        title="Delete topic"
+                      >
+                        <Trash2 className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
           <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />
         </>

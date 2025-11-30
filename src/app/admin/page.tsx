@@ -41,7 +41,7 @@ export default function AdminDashboardPage() {
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <Users className="mr-2 h-5 w-5" />
-            User Management
+            Users
           </button>
           <button
             onClick={() => setActiveTab('topics')}
@@ -52,7 +52,7 @@ export default function AdminDashboardPage() {
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <BookOpen className="mr-2 h-5 w-5" />
-            Topic Management
+            Topics
           </button>
           <button
             onClick={() => setActiveTab('questions')}
@@ -63,7 +63,7 @@ export default function AdminDashboardPage() {
             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center`}
           >
             <HelpCircle className="mr-2 h-5 w-5" />
-            Question Management
+            Questions
           </button>
         </nav>
       </div>

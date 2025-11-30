@@ -82,7 +82,9 @@ export const AdminTopicManagement = () => {
   return (
     <div>
       <h2 className="text-xl font-bold text-gray-900 mb-4">All Topics Management</h2>
-      <div className="bg-white shadow overflow-hidden sm:rounded-lg">
+
+      {/* Desktop table view */}
+      <div className="hidden md:block bg-white shadow overflow-hidden sm:rounded-lg">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -157,6 +159,49 @@ export const AdminTopicManagement = () => {
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* Mobile card view */}
+      <div className="md:hidden space-y-4">
+        {topics.map((topic) => (
+          <div key={topic.id} className="bg-white shadow rounded-lg p-4">
+            <div className="flex items-start justify-between mb-2">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-medium text-gray-900 mb-1">{topic.title}</h3>
+                {topic.description && <p className="text-xs text-gray-500 line-clamp-2 mb-2">{topic.description}</p>}
+              </div>
+              <div className="flex gap-2 ml-2">
+                <Link href={`/topics/${topic.id}`} className="text-indigo-600 hover:text-indigo-900" title="View">
+                  <Eye className="h-5 w-5" />
+                </Link>
+                <button
+                  onClick={() => openDeleteModal(topic.id)}
+                  className="text-red-600 hover:text-red-900"
+                  title="Delete"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center gap-2">
+                {topic.isPrivate ? (
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800 flex items-center">
+                    <Lock className="h-3 w-3 mr-1" /> Private
+                  </span>
+                ) : (
+                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 flex items-center">
+                    <Unlock className="h-3 w-3 mr-1" /> Public
+                  </span>
+                )}
+              </div>
+              <div className="text-right">
+                <div>User #{topic.userId}</div>
+                <div>{new Date(topic.createdAt).toLocaleDateString()}</div>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {topics.length > 0 && <PaginationBar currentPage={page} isNextDisabled={!hasMore} onPageChange={setPage} />}

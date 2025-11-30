@@ -142,7 +142,7 @@ export const AdminTopicManagement = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <Link
                     href={`/topics/${topic.id}`}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4 inline-block"
+                    className="text-primary-600 hover:text-primary-900 mr-4 inline-block"
                     title="View"
                   >
                     <Eye className="h-5 w-5" />
@@ -171,7 +171,7 @@ export const AdminTopicManagement = () => {
                 {topic.description && <p className="text-xs text-gray-500 line-clamp-2 mb-2">{topic.description}</p>}
               </div>
               <div className="flex gap-2 ml-2">
-                <Link href={`/topics/${topic.id}`} className="text-indigo-600 hover:text-indigo-900" title="View">
+                <Link href={`/topics/${topic.id}`} className="text-primary-600 hover:text-primary-900" title="View">
                   <Eye className="h-5 w-5" />
                 </Link>
                 <button

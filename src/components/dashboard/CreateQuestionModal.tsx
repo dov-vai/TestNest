@@ -201,7 +201,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
           <select
-            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
             value={questionType}
             onChange={(e) => {
               setQuestionType(e.target.value);
@@ -226,7 +226,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
                   name="trueFalse"
                   checked={trueFalseAnswer === true}
                   onChange={() => setTrueFalseAnswer(true)}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="mr-2 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                 />
                 <span className="text-sm text-gray-700">True</span>
               </label>
@@ -236,7 +236,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
                   name="trueFalse"
                   checked={trueFalseAnswer === false}
                   onChange={() => setTrueFalseAnswer(false)}
-                  className="mr-2 h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                  className="mr-2 h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                 />
                 <span className="text-sm text-gray-700">False</span>
               </label>
@@ -293,14 +293,14 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
                         name="correctAnswer"
                         checked={answer.isCorrect}
                         onChange={() => toggleCorrect(index)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 cursor-pointer"
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 cursor-pointer"
                       />
                     ) : questionType === 'multi' ? (
                       <input
                         type="checkbox"
                         checked={answer.isCorrect}
                         onChange={() => toggleCorrect(index)}
-                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                        className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded cursor-pointer"
                       />
                     ) : null}
 
@@ -353,7 +353,7 @@ export const CreateQuestionModal: React.FC<CreateQuestionModalProps> = ({
             id="isPrivate"
             checked={isPrivate}
             onChange={(e) => setIsPrivate(e.target.checked)}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
           />
           <label htmlFor="isPrivate" className="ml-2 block text-sm text-gray-700">
             Make this question private

@@ -206,7 +206,7 @@ export default function AttemptPage() {
   return (
     <div className="max-w-3xl mx-auto pb-12">
       <div className="mb-8 flex items-center justify-between">
-        <Link href="/dashboard" className="text-indigo-600 flex items-center">
+        <Link href="/dashboard" className="text-primary-600 flex items-center">
           <ArrowLeft className="h-4 w-4 mr-1" /> Dashboard
         </Link>
         {isReview && (
@@ -231,7 +231,7 @@ export default function AttemptPage() {
             <div
               key={q.id}
               className={`bg-white shadow rounded-lg p-6 border-l-4 ${
-                isReview ? (isCorrect ? 'border-green-500' : 'border-red-500') : 'border-indigo-500'
+                isReview ? (isCorrect ? 'border-green-500' : 'border-red-500') : 'border-primary-500'
               }`}
             >
               <div className="flex justify-between items-start mb-4">
@@ -262,7 +262,7 @@ export default function AttemptPage() {
                       <label
                         key={opt.id}
                         className={`flex items-center p-3 rounded-md border ${
-                          isSelected ? 'bg-indigo-50 border-indigo-200' : 'border-gray-200 hover:bg-gray-50'
+                          isSelected ? 'bg-primary-50 border-primary-200' : 'border-gray-200 hover:bg-gray-50'
                         } cursor-pointer`}
                       >
                         <input
@@ -287,7 +287,7 @@ export default function AttemptPage() {
                             }
                           }}
                           disabled={isReview}
-                          className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300"
+                          className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300"
                         />
                         <span className="ml-3 text-gray-700">{opt.text}</span>
                       </label>

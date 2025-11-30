@@ -86,7 +86,7 @@ export default function ManageTopicPage() {
   return (
     <div>
       <div className="mb-6 flex items-center justify-between">
-        <Link href="/dashboard" className="text-indigo-600 flex items-center">
+        <Link href="/dashboard" className="text-primary-600 flex items-center">
           <ArrowLeft className="h-4 w-4 mr-1" /> Dashboard
         </Link>
         <h1 className="text-2xl font-bold text-gray-900">Manage Questions</h1>
@@ -111,7 +111,7 @@ export default function ManageTopicPage() {
               <li key={tq.id} className="px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm font-medium text-indigo-600 truncate">
+                    <p className="text-sm font-medium text-primary-600 truncate">
                       {index + 1}. {tq.question.text}
                     </p>
                     <div className="ml-2 flex-shrink-0 flex">
@@ -125,7 +125,7 @@ export default function ManageTopicPage() {
                 <div className="ml-4 flex-shrink-0 flex gap-2">
                   <button
                     onClick={() => openEditModal(tq.question.id)}
-                    className="text-indigo-600 hover:text-indigo-900"
+                    className="text-primary-600 hover:text-primary-900"
                     title="Edit question"
                   >
                     <Edit className="h-5 w-5" />

@@ -35,7 +35,7 @@ export default function TopicDetailPage() {
         const response = await fetchWithAuth(`/api/topics/${id}`);
         if (!response.ok) {
           if (response.status === 403) {
-              throw new Error('You do not have permission to view this topic.');
+            throw new Error('You do not have permission to view this topic.');
           }
           throw new Error('Failed to fetch topic details');
         }
@@ -101,7 +101,7 @@ export default function TopicDetailPage() {
     <div className="bg-white shadow sm:rounded-lg overflow-hidden">
       <div className="px-4 py-5 sm:px-6">
         <div className="flex items-center justify-between">
-          <Link href="/" className="text-indigo-600 hover:text-indigo-900 flex items-center mb-4">
+          <Link href="/" className="text-primary-600 hover:text-primary-900 flex items-center mb-4">
             <ArrowLeft className="mr-2 h-4 w-4" /> Back
           </Link>
           <div className="flex items-center text-sm text-gray-500">
@@ -117,7 +117,7 @@ export default function TopicDetailPage() {
           </div>
         </div>
         <h1 className="text-3xl font-bold leading-tight text-gray-900 flex items-center">
-          <BookOpen className="h-8 w-8 mr-3 text-indigo-600" />
+          <BookOpen className="h-8 w-8 mr-3 text-primary-600" />
           {topic.title}
         </h1>
         <p className="mt-4 text-lg text-gray-500">{topic.description}</p>
@@ -126,12 +126,7 @@ export default function TopicDetailPage() {
         <div className="mb-4 sm:mb-0 text-sm text-gray-500">
           Created on {new Date(topic.createdAt).toLocaleDateString()}
         </div>
-        <Button
-          size="lg"
-          onClick={handleStartAttempt}
-          isLoading={startingAttempt}
-          className="w-full sm:w-auto"
-        >
+        <Button size="lg" onClick={handleStartAttempt} isLoading={startingAttempt} className="w-full sm:w-auto">
           <PlayCircle className="mr-2 h-5 w-5" />
           Start Test
         </Button>

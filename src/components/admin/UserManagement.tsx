@@ -203,7 +203,7 @@ export const UserManagement = () => {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button onClick={() => handleEditUser(user)} className="text-indigo-600 hover:text-indigo-900 mr-4">
+                  <button onClick={() => handleEditUser(user)} className="text-primary-600 hover:text-primary-900 mr-4">
                     <Edit2 className="h-5 w-5" />
                   </button>
                   <button onClick={() => openDeleteModal(user.id)} className="text-red-600 hover:text-red-900">
@@ -233,7 +233,7 @@ export const UserManagement = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleEditUser(user)} className="text-indigo-600 hover:text-indigo-900">
+                <button onClick={() => handleEditUser(user)} className="text-primary-600 hover:text-primary-900">
                   <Edit2 className="h-5 w-5" />
                 </button>
                 <button onClick={() => openDeleteModal(user.id)} className="text-red-600 hover:text-red-900">
@@ -285,7 +285,7 @@ export const UserManagement = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
             <select
-              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border"
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md border"
               value={editForm.role}
               onChange={(e) => setEditForm({ ...editForm, role: e.target.value as 'user' | 'admin' })}
             >
@@ -298,7 +298,7 @@ export const UserManagement = () => {
             <input
               id="isActive"
               type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               checked={editForm.isActive}
               onChange={(e) => setEditForm({ ...editForm, isActive: e.target.checked })}
             />

@@ -88,13 +88,13 @@ export const MyQuestionsTab = () => {
             questions.map((q: Question) => (
               <li key={q.id} className="px-4 py-4 sm:px-6 flex items-center justify-between hover:bg-gray-50">
                 <div>
-                  <p className="text-sm font-medium text-indigo-600">{q.text}</p>
+                  <p className="text-sm font-medium text-primary-600">{q.text}</p>
                   <p className="text-xs text-gray-500">Type: {q.type}</p>
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => openEditModal(q.id)}
-                    className="text-indigo-600 hover:text-indigo-800"
+                    className="text-primary-600 hover:text-primary-800"
                     title="Edit question"
                   >
                     <Edit className="h-5 w-5" />

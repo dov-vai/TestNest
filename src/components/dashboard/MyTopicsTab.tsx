@@ -136,7 +136,7 @@ export const MyTopicsTab: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <Link href={`/topics/${topic.id}`} className="block">
                         <div className="flex items-center gap-2">
-                          <p className="text-sm font-medium text-indigo-600 truncate">{topic.title}</p>
+                          <p className="text-sm font-medium text-primary-600 truncate">{topic.title}</p>
                           {topic.isPrivate ? (
                             <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" title="Private" />
                           ) : (
@@ -158,7 +158,7 @@ export const MyTopicsTab: React.FC = () => {
                       </Link>
                       <button
                         onClick={() => openEditModal(topic)}
-                        className="text-indigo-600 hover:text-indigo-800"
+                        className="text-primary-600 hover:text-primary-800"
                         title="Edit topic"
                       >
                         <Edit2 className="h-5 w-5" />
@@ -204,7 +204,7 @@ export const MyTopicsTab: React.FC = () => {
             <input
               id="isPrivate"
               type="checkbox"
-              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
               checked={topicForm.isPrivate}
               onChange={(e) => setTopicForm({ ...topicForm, isPrivate: e.target.checked })}
             />

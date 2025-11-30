@@ -44,7 +44,7 @@ export const QuestionCard: React.FC<QuestionCardProps> = ({
     <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow duration-200 border border-gray-100 flex flex-col h-full">
       <div className="px-4 py-5 sm:p-6 flex-grow">
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center text-indigo-600">
+          <div className="flex items-center text-primary-600">
             <HelpCircle className="h-5 w-5 mr-2" />
           </div>
           <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">

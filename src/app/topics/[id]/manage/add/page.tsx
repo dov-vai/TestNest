@@ -147,7 +147,7 @@ export default function AddQuestionsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
       <div className="mb-6 sm:mb-8">
-        <Link href={`/topics/${id}/manage`} className="text-indigo-600 hover:text-indigo-900 flex items-center mb-4">
+        <Link href={`/topics/${id}/manage`} className="text-primary-600 hover:text-primary-900 flex items-center mb-4">
           <ArrowLeft className="h-4 w-4 mr-1" /> Back to Manage Questions
         </Link>
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add Existing Questions</h1>

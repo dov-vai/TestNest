@@ -137,10 +137,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle validation errors with issues array
-        if (data.issues && Array.isArray(data.issues)) {
-          const errorMessage = data.issues.join(', ');
-          throw new Error(errorMessage);
+        // Handle validation errors with properties object
+        if (data.issues?.properties) {
+          // Throw the entire validation error structure as JSON string (including error field)
+          throw new Error(JSON.stringify({ error: data.error, issues: data.issues }));
         }
         throw new Error(data.error || data.message || 'Registration failed');
       }

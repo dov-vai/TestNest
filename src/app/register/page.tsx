@@ -13,19 +13,46 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setFieldErrors({});
     setIsLoading(true);
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
 
     try {
       await register(email, password, name);
       router.push('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to register');
+      if (err instanceof Error) {
+        try {
+          const parsed = JSON.parse(err.message);
+          if (parsed.issues?.properties) {
+            const errors: Record<string, string[]> = {};
+            for (const [field, data] of Object.entries(parsed.issues.properties)) {
+              errors[field] = (data as { errors: string[] }).errors;
+            }
+            setFieldErrors(errors);
+            setError(parsed.error || 'Validation failed');
+          } else {
+            setError(err.message);
+          }
+        } catch {
+          setError(err.message);
+        }
+      } else {
+        setError('Failed to register');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -52,6 +79,7 @@ export default function RegisterPage() {
               autoComplete="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              error={fieldErrors.name?.[0]}
             />
 
             <Input
@@ -61,6 +89,7 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              error={fieldErrors.email?.[0]}
             />
 
             <Input
@@ -70,7 +99,23 @@ export default function RegisterPage() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              error={password.length > 0 && password.length < 8 ? 'Password must be at least 8 characters' : undefined}
+              error={
+                fieldErrors.password?.[0] ||
+                (password.length > 0 && password.length < 8 ? 'Password must be at least 8 characters' : undefined)
+              }
+            />
+
+            <Input
+              label="Confirm Password"
+              type="password"
+              autoComplete="confirm-password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              error={
+                fieldErrors.confirmPassword?.[0] ||
+                (confirmPassword.length > 0 && confirmPassword !== password ? 'Passwords do not match' : undefined)
+              }
             />
 
             {error && (

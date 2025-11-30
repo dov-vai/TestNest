@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Button } from '@/components/ui/Button';
@@ -23,6 +23,7 @@ interface AnswerOption {
   id: number;
   questionId: number;
   text: string;
+  isCorrect?: boolean;
 }
 
 interface Attempt {
@@ -43,8 +44,12 @@ interface UserAnswer {
 
 export default function AttemptPage() {
   const { id } = useParams();
+  const searchParams = useSearchParams();
   const { accessToken, user } = useAuth();
   const fetchWithAuth = useAuthenticatedFetch();
+
+  const isGuestMode = id === 'guest';
+  const topicId = searchParams.get('topicId');
 
   const [attempt, setAttempt] = useState<Attempt | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -53,60 +58,122 @@ export default function AttemptPage() {
   const [answersMap, setAnswersMap] = useState<Record<number, UserAnswer>>({});
   const [submitting, setSubmitting] = useState(false);
   const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [guestCompleted, setGuestCompleted] = useState(false);
 
   const fetchAttemptData = useCallback(async () => {
     try {
-      // 1. Fetch Attempt
-      const attemptRes = await fetchWithAuth(`/api/attempts/${id}`);
-      if (!attemptRes.ok) throw new Error('Failed to fetch attempt');
-      const attemptData = await attemptRes.json();
-      setAttempt(attemptData);
+      if (isGuestMode) {
+        if (!topicId) {
+          throw new Error('Topic ID is required for guest mode');
+        }
 
-      // Populate initial answers map
-      const initialAnswers: Record<number, UserAnswer> = {};
-      if (attemptData.answers) {
-        attemptData.answers.forEach((ans: UserAnswer) => {
-          initialAnswers[ans.topicQuestionId] = ans;
-        });
+        // For guests, create a fake attempt object
+        const attemptObj = {
+          id: 0,
+          topicId: Number(topicId),
+          isCompleted: guestCompleted,
+          totalPoints: 0, // Will be calculated after fetching questions
+          earnedPoints: 0,
+        };
+
+        // Fetch Questions for Topic (public endpoint)
+        const questionsRes = await fetch(`/api/topics/${topicId}/questions`);
+        if (!questionsRes.ok) throw new Error('Failed to fetch questions');
+        const questionsData = await questionsRes.json();
+
+        // Fetch Answers (Options) for Topic (public endpoint)
+        const optionsRes = await fetch(`/api/topics/${topicId}/answers`);
+        if (!optionsRes.ok) throw new Error('Failed to fetch options');
+        const optionsData = await optionsRes.json();
+
+        // Merge Questions and Options
+        const mergedQuestions = questionsData.map((q: any) => ({
+          id: q.id,
+          questionId: q.question.id,
+          text: q.question.text,
+          type: q.question.type,
+          points: q.points,
+          options: optionsData
+            .filter((opt: any) => opt.questionId === q.question.id)
+            .map((opt: any) => ({
+              id: opt.id,
+              questionId: opt.questionId,
+              text: opt.text,
+              isCorrect: guestCompleted ? opt.isCorrect : undefined,
+            })),
+        }));
+
+        setQuestions(mergedQuestions);
+
+        // Calculate total points
+        const total = mergedQuestions.reduce((sum: number, q: any) => sum + q.points, 0);
+        attemptObj.totalPoints = total;
+
+        // If completed, preserve the earned points from state
+        if (guestCompleted && attempt) {
+          attemptObj.earnedPoints = attempt.earnedPoints;
+        }
+
+        setAttempt(attemptObj);
+      } else {
+        // Authenticated mode - fetch from API
+        const attemptRes = await fetchWithAuth(`/api/attempts/${id}`);
+        if (!attemptRes.ok) throw new Error('Failed to fetch attempt');
+        const attemptData = await attemptRes.json();
+        setAttempt(attemptData);
+
+        // Populate initial answers map
+        const initialAnswers: Record<number, UserAnswer> = {};
+        if (attemptData.answers) {
+          attemptData.answers.forEach((ans: UserAnswer) => {
+            initialAnswers[ans.topicQuestionId] = ans;
+          });
+        }
+        setAnswersMap(initialAnswers);
+
+        // Fetch Questions for Topic
+        const questionsRes = await fetchWithAuth(`/api/topics/${attemptData.topicId}/questions`);
+        if (!questionsRes.ok) throw new Error('Failed to fetch questions');
+        const questionsData = await questionsRes.json();
+
+        // Fetch Answers (Options) for Topic
+        const optionsRes = await fetchWithAuth(`/api/topics/${attemptData.topicId}/answers`);
+        if (!optionsRes.ok) throw new Error('Failed to fetch options');
+        const optionsData = await optionsRes.json();
+
+        // Merge Questions and Options
+        const mergedQuestions = questionsData.map((q: any) => ({
+          id: q.id,
+          questionId: q.question.id,
+          text: q.question.text,
+          type: q.question.type,
+          points: q.points,
+          options: optionsData
+            .filter((opt: any) => opt.questionId === q.question.id)
+            .map((opt: any) => ({
+              id: opt.id,
+              questionId: opt.questionId,
+              text: opt.text,
+              isCorrect: attemptData.isCompleted ? opt.isCorrect : undefined,
+            })),
+        }));
+
+        setQuestions(mergedQuestions);
       }
-      setAnswersMap(initialAnswers);
-
-      // 2. Fetch Questions for Topic
-      const questionsRes = await fetchWithAuth(`/api/topics/${attemptData.topicId}/questions`);
-      if (!questionsRes.ok) throw new Error('Failed to fetch questions');
-      const questionsData = await questionsRes.json();
-
-      // 3. Fetch Answers (Options) for Topic
-      const optionsRes = await fetchWithAuth(`/api/topics/${attemptData.topicId}/answers`);
-      if (!optionsRes.ok) throw new Error('Failed to fetch options');
-      const optionsData = await optionsRes.json();
-
-      // 4. Merge Questions and Options
-      const mergedQuestions = questionsData.map((q: any) => ({
-        id: q.id, // This is the linkId (topicQuestionId)
-        questionId: q.question.id,
-        text: q.question.text,
-        type: q.question.type,
-        points: q.points,
-        options: optionsData.filter((opt: any) => opt.questionId === q.question.id),
-      }));
-
-      setQuestions(mergedQuestions);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
-  }, [id, fetchWithAuth]);
+  }, [id, topicId, isGuestMode, guestCompleted, fetchWithAuth]);
 
   useEffect(() => {
-    if (accessToken) {
+    if (isGuestMode || accessToken) {
       fetchAttemptData();
     } else if (!user) {
-      // Redirect to login if no user (since attempt requires auth)
-      // But wait, useEffect runs on mount.
+      // Redirect to login if not guest mode and no user
     }
-  }, [accessToken, fetchAttemptData, user]);
+  }, [accessToken, fetchAttemptData, user, isGuestMode]);
 
   const handleAnswerChange = (questionId: number, value: string | number, isChecked?: boolean) => {
     if (attempt?.isCompleted) return;
@@ -148,6 +215,9 @@ export default function AttemptPage() {
   const submitAnswer = async (questionId: number, answerIds: number[] = [], userAnswerText: string | null = null) => {
     if (answerIds.length === 0 && !userAnswerText) return;
 
+    // For guest mode, answers are only stored in local state
+    if (isGuestMode) return;
+
     try {
       const res = await fetchWithAuth(`/api/attempts/${id}/answers`, {
         method: 'POST',
@@ -177,18 +247,84 @@ export default function AttemptPage() {
     setIsSubmitModalOpen(false);
     setSubmitting(true);
     try {
-      const res = await fetchWithAuth(`/api/attempts/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ isCompleted: true }),
-      });
+      if (isGuestMode) {
+        // For guest mode, fetch correct answers and calculate score locally
+        if (!topicId) return;
 
-      if (!res.ok) throw new Error('Failed to complete attempt');
+        // Fetch correct answers from API
+        const optionsRes = await fetch(`/api/topics/${topicId}/answers`);
+        if (!optionsRes.ok) throw new Error('Failed to fetch options');
+        const optionsData = await optionsRes.json();
 
-      // Refresh data to show results
-      await fetchAttemptData();
+        let earnedPoints = 0;
+        const updatedAnswers: Record<number, UserAnswer> = { ...answersMap };
+
+        questions.forEach((q) => {
+          const userAnswer = answersMap[q.id];
+          if (!userAnswer) return;
+
+          // Get correct options for this question
+          const correctOptions = optionsData.filter((opt: any) => opt.questionId === q.questionId && opt.isCorrect);
+
+          if (q.type === 'fill_blank' && userAnswer.userAnswerText) {
+            // Check if text answer matches any correct option
+            const isCorrect = correctOptions.some(
+              (opt: any) => opt.text.toLowerCase().trim() === userAnswer.userAnswerText?.toLowerCase().trim()
+            );
+            if (isCorrect) {
+              earnedPoints += q.points;
+            }
+            updatedAnswers[q.id] = { ...userAnswer, isCorrect };
+          } else if (userAnswer.answerIds && userAnswer.answerIds.length > 0) {
+            const correctAnswerIds = correctOptions.map((opt: any) => opt.id);
+
+            let isCorrect = false;
+            if (q.type === 'multi') {
+              // Multi-select: exact match required
+              const selectedSet = new Set(userAnswer.answerIds);
+              const correctSet = new Set(correctAnswerIds);
+              isCorrect = selectedSet.size === correctSet.size && [...selectedSet].every((id) => correctSet.has(id));
+            } else {
+              // Single-select: check if selected answer is in correct answers
+              isCorrect = correctAnswerIds.includes(userAnswer.answerIds[0]);
+            }
+
+            if (isCorrect) {
+              earnedPoints += q.points;
+            }
+            updatedAnswers[q.id] = { ...userAnswer, isCorrect };
+          }
+        });
+
+        // Update all answers at once
+        setAnswersMap(updatedAnswers);
+
+        setAttempt((prev) =>
+          prev
+            ? {
+                ...prev,
+                isCompleted: true,
+                earnedPoints,
+              }
+            : null
+        );
+        setGuestCompleted(true);
+      } else {
+        // Authenticated mode
+        const res = await fetchWithAuth(`/api/attempts/${id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ isCompleted: true }),
+        });
+
+        if (!res.ok) throw new Error('Failed to complete attempt');
+
+        // Refresh data to show results
+        await fetchAttemptData();
+      }
+
       window.scrollTo(0, 0);
     } catch (err) {
       alert('Error finishing test');
@@ -224,8 +360,10 @@ export default function AttemptPage() {
           const userAnswer = answersMap[q.id];
           const isCorrect = userAnswer?.isCorrect; // Only available if review
 
-          // Determine correct answer text for review
-          // Note: logic kept from previous version
+          // Find correct answers for display in review mode
+          const correctOptions = isReview ? q.options.filter((opt) => opt.isCorrect) : [];
+          const correctAnswerText =
+            correctOptions.length > 0 ? correctOptions.map((opt) => opt.text).join(', ') : 'N/A';
 
           return (
             <div
@@ -297,9 +435,23 @@ export default function AttemptPage() {
               </div>
 
               {isReview && !isCorrect && (
-                <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md flex items-center">
-                  <XCircle className="h-5 w-5 mr-2" />
-                  <span>Incorrect</span>
+                <div className="mt-4 space-y-2">
+                  <div className="p-3 bg-red-50 text-red-700 rounded-md flex items-center">
+                    <XCircle className="h-5 w-5 mr-2 flex-shrink-0" />
+                    <span>Incorrect</span>
+                  </div>
+                  {q.type === 'fill_blank' && correctOptions.length > 0 && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-md">
+                      <p className="font-medium mb-1">Correct answer(s):</p>
+                      <p>{correctAnswerText}</p>
+                    </div>
+                  )}
+                  {q.type !== 'fill_blank' && correctOptions.length > 0 && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-md">
+                      <p className="font-medium mb-1">Correct answer(s):</p>
+                      <p>{correctAnswerText}</p>
+                    </div>
+                  )}
                 </div>
               )}
               {isReview && isCorrect && (

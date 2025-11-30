@@ -54,30 +54,36 @@ export default function TopicDetailPage() {
   }, [id, hasInitialized, fetchWithAuth]);
 
   const handleStartAttempt = async () => {
-    if (!user) {
-      router.push(`/login?redirect=/topics/${id}`);
-      return;
-    }
-
     setStartingAttempt(true);
     try {
-      const response = await fetchWithAuth('/api/attempts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ topicId: Number(id) }),
-      });
+      if (!user) {
+        // Guest mode: navigate directly to attempt page with 'guest' id
+        if (topic?.isPrivate) {
+          router.push(`/login?redirect=/topics/${id}`);
+          return;
+        }
+        router.push(`/attempts/guest?topicId=${id}`);
+      } else {
+        // Authenticated: create server-side attempt
+        const response = await fetchWithAuth('/api/attempts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ topicId: Number(id) }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to start attempt');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Failed to start attempt');
+        }
+
+        const attempt = await response.json();
+        router.push(`/attempts/${attempt.id}`);
       }
-
-      const attempt = await response.json();
-      router.push(`/attempts/${attempt.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start test');
+    } finally {
       setStartingAttempt(false);
     }
   };

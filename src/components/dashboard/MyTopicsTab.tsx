@@ -124,7 +124,7 @@ export const MyTopicsTab: React.FC = () => {
 
       {!topics || topics.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg shadow">
-          <p className="text-gray-500">You haven't created any topics yet.</p>
+          <p className="text-gray-500">You haven&apos;t created any topics yet.</p>
         </div>
       ) : (
         <>
@@ -138,9 +138,9 @@ export const MyTopicsTab: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-primary-600 truncate">{topic.title}</p>
                           {topic.isPrivate ? (
-                            <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" title="Private" />
+                            <Lock className="h-4 w-4 text-amber-600 flex-shrink-0" />
                           ) : (
-                            <Unlock className="h-4 w-4 text-green-600 flex-shrink-0" title="Public" />
+                            <Unlock className="h-4 w-4 text-green-600 flex-shrink-0" />
                           )}
                         </div>
                         {topic.description && (

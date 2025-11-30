@@ -1,5 +1,5 @@
 import { DB } from '@/db/client';
-import { Question, questions, topicQuestions } from '@/db/schema';
+import { Question, questions, topicQuestions, answers, Answer } from '@/db/schema';
 import { eq, asc, inArray, or, and } from 'drizzle-orm';
 
 export type Pagination = { limit: number; offset: number };
@@ -29,6 +29,63 @@ export async function listQuestions(
   return whereClause
     ? query.where(whereClause).limit(limit).offset(offset).orderBy(asc(questions.id))
     : query.limit(limit).offset(offset).orderBy(asc(questions.id));
+}
+
+export type QuestionWithAnswers = Question & {
+  answers: Answer[];
+};
+
+export async function listQuestionsWithAnswers(
+  db: DB,
+  { limit, offset }: Pagination,
+  userId?: number,
+  isAdmin?: boolean,
+  creatorId?: number
+): Promise<QuestionWithAnswers[]> {
+  let whereClause;
+
+  if (creatorId) {
+    whereClause = eq(questions.userId, creatorId);
+  } else if (isAdmin) {
+    whereClause = undefined;
+  } else if (userId) {
+    whereClause = or(eq(questions.isPrivate, false), and(eq(questions.userId, userId), eq(questions.isPrivate, true)));
+  } else {
+    whereClause = eq(questions.isPrivate, false);
+  }
+
+  // Get questions with pagination
+  const questionsQuery = db.select().from(questions);
+  const questionsList = whereClause
+    ? await questionsQuery.where(whereClause).limit(limit).offset(offset).orderBy(asc(questions.id))
+    : await questionsQuery.limit(limit).offset(offset).orderBy(asc(questions.id));
+
+  if (questionsList.length === 0) {
+    return [];
+  }
+
+  // Get all answers for these questions
+  const questionIds = questionsList.map((q) => q.id);
+  const answersList = await db
+    .select()
+    .from(answers)
+    .where(inArray(answers.questionId, questionIds))
+    .orderBy(asc(answers.orderIdx));
+
+  // Map answers to questions
+  const answersMap = new Map<number, Answer[]>();
+  for (const answer of answersList) {
+    if (!answersMap.has(answer.questionId)) {
+      answersMap.set(answer.questionId, []);
+    }
+    answersMap.get(answer.questionId)!.push(answer);
+  }
+
+  // Combine questions with their answers
+  return questionsList.map((question) => ({
+    ...question,
+    answers: answersMap.get(question.id) || [],
+  }));
 }
 
 export async function createQuestion(

@@ -3,7 +3,7 @@ import { db } from '@/db/client';
 import { json, badRequest, serverError, unauthorized } from '../_lib/http';
 import { paginationSchema } from '../_lib/schemas/common';
 import { questionCreateSchema } from '../_lib/schemas/question';
-import { listQuestions, createQuestion } from '@/db/queries/questions';
+import { listQuestions, createQuestion, listQuestionsWithAnswers } from '@/db/queries/questions';
 import { authenticate, requireAuth, isAdmin } from '../_lib/middleware';
 
 /**
@@ -26,10 +26,16 @@ export async function GET(req: NextRequest) {
     const creatorIdParam = searchParams.get('creator_id');
     const creatorId = creatorIdParam ? parseInt(creatorIdParam) : undefined;
 
+    // Check if we should include answers
+    const includeAnswers = searchParams.get('include_answers') === 'true';
+
     // Strict creator filtering logic similar to topics
     const effectiveCreatorId = creatorId && (creatorId === user?.userId || isAdmin(user)) ? creatorId : undefined;
 
-    const data = await listQuestions(db, { limit, offset }, user?.userId, isAdmin(user), effectiveCreatorId);
+    const data = includeAnswers
+      ? await listQuestionsWithAnswers(db, { limit, offset }, user?.userId, isAdmin(user), effectiveCreatorId)
+      : await listQuestions(db, { limit, offset }, user?.userId, isAdmin(user), effectiveCreatorId);
+
     return json(data);
   } catch (e) {
     return serverError(e);

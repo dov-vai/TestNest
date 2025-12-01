@@ -7,7 +7,7 @@ import { useAuthenticatedFetch } from '@/hooks/useAuthenticatedFetch';
 import { Button } from '@/components/ui/Button';
 import { Loader } from '@/components/ui/Loader';
 import { Modal } from '@/components/ui/Modal';
-import { ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, BookOpen, CheckCircle, XCircle } from 'lucide-react';
 import Link from 'next/link';
 
 interface Question {
@@ -339,12 +339,27 @@ export default function AttemptPage() {
 
   const isReview = attempt.isCompleted;
 
+  // Handle case when there are no questions
+  if (questions.length === 0) {
+    return (
+      <div className="max-w-3xl mx-auto pb-12">
+        <div className="bg-white shadow rounded-lg p-8 text-center">
+          <BookOpen className="h-16 w-16 mx-auto text-gray-400 mb-4" />
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">No Questions Available</h2>
+          <p className="text-gray-500 mb-6">This topic doesn&apos;t have any questions yet. Please check back later.</p>
+          <Link href="/">
+            <Button variant="outline">
+              <ArrowLeft className="mr-2 h-4 w-4" /> Back to Topics
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-3xl mx-auto pb-12">
       <div className="mb-8 flex items-center justify-between">
-        <Link href="/dashboard" className="text-primary-600 flex items-center">
-          <ArrowLeft className="h-4 w-4 mr-1" /> Dashboard
-        </Link>
         {isReview && (
           <div className="text-2xl font-bold text-gray-900">
             Score:{' '}

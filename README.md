@@ -113,7 +113,7 @@ Serverio pusėje:
 
 # API specifikacija
 
-Prieinama [čia](/public/openapi.json) (openapi.json)
+Prieinama [čia](/public/openapi.json) (openapi.json). Patogesnei peržiūrai (su pavyzdžiais): https://testnest.dov.lt/api-docs
 
 # Išvados
 
